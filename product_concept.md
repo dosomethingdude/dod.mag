@@ -37,15 +37,17 @@
 ## 기술 스택
 
 - **프론트엔드**: 순수 HTML, CSS, JavaScript (단일 파일)
-- **데이터 저장**: LocalStorage
+- **데이터 저장**: LocalStorage + posts.json (Gemini 자동화용)
 - **이메일 발송**: EmailJS (무료 월 200건)
 - **다국어 지원**: 한국어, 영어, 중국어
 - **폰트**: Pretendard Variable
-- **호스팅**: (미정)
+- **호스팅**: Cloudflare Pages
+- **자동화**: Google Apps Script + Gemini API
+- **분석**: Google Analytics 4
 
 ---
 
-## 현재 구현된 기능 (v2.2)
+## 현재 구현된 기능 (v2.3)
 
 ### ✅ 완료
 - [x] 반응형 레이아웃 (1200px, 900px, 600px 브레이크포인트)
@@ -59,11 +61,18 @@
 - [x] 구독자 정보 LocalStorage 저장
 - [x] 샘플 게시글 6개 (2000자 내외 확장된 콘텐츠)
 - [x] 구독 시 웰컴 이메일 발송 (EmailJS 연동)
-- [x] **캐러셀 화살표 버튼 심플화** (투명 배경, 테두리 없음)
-- [x] **한글 단어 해체 방지** (word-break: keep-all)
-- [x] **카테고리별 전체보기 페이지** (4개 카테고리 각각)
-- [x] **스크롤 탑 버튼** (우측 하단 고정, 300px 스크롤 시 표시)
-- [x] **다국어 지원** (한국어/영어/중국어 전환 버튼)
+- [x] 캐러셀 화살표 버튼 심플화 (투명 배경, 테두리 없음)
+- [x] 한글 단어 해체 방지 (word-break: keep-all)
+- [x] 카테고리별 전체보기 페이지 (4개 카테고리 각각)
+- [x] 스크롤 탑 버튼 (우측 하단 고정, 300px 스크롤 시 표시)
+- [x] 다국어 지원 (한국어/영어/중국어 전환 버튼)
+- [x] **SEO 메타태그** (Open Graph, Twitter Card)
+- [x] **Google Analytics 4 연동 준비**
+- [x] **광고 슬롯 3개 배치** (배너 2개 + 리더보드 1개)
+- [x] **개인정보처리방침 / 이용약관 페이지**
+- [x] **푸터 섹션** (정책 링크, 저작권)
+- [x] **posts.json 연동** (Gemini 자동화용 외부 데이터 소스)
+- [x] **Gemini 자동 글 생성 스크립트** (Google Apps Script)
 
 ---
 
@@ -129,16 +138,46 @@ const EMAILJS_CONFIG = {
 
 ---
 
+## 수익화 설정 가이드
+
+### Google Analytics 4 설정
+1. [analytics.google.com](https://analytics.google.com) 접속
+2. 속성 만들기 → 웹 스트림 추가
+3. 측정 ID (G-XXXXXXXXXX) 복사
+4. `index.html`에서 `G-XXXXXXXXXX`를 실제 ID로 교체
+
+### Gemini 자동 글 생성 설정
+1. [Google AI Studio](https://makersuite.google.com/app/apikey)에서 API 키 발급
+2. GitHub Personal Access Token 발급 (repo 권한)
+3. [script.google.com](https://script.google.com)에서 `automation/gemini-auto-post.gs` 붙여넣기
+4. CONFIG 값 수정 후 트리거 설정 (매일 원하는 시간)
+
+### AdSense 신청 조건
+- 커스텀 도메인 필수
+- 콘텐츠 15-20개 이상
+- 개인정보처리방침 페이지 (완료)
+- 1-3개월 운영 권장
+
+### 쿠팡 파트너스
+- [partners.coupang.com](https://partners.coupang.com) 가입
+- 제품 리뷰 콘텐츠에 제휴 링크 삽입
+
+---
+
 ## 향후 작업 예정 (Backlog)
 
 ### 🔜 우선순위 높음
-- [ ] (여기에 추가 예정)
+- [ ] GitHub 업로드 완료
+- [ ] Cloudflare Pages 배포
+- [ ] 쿠팡 파트너스 가입
 
 ### 📋 우선순위 중간
-- [ ] (여기에 추가 예정)
+- [ ] 콘텐츠 15개 이상 작성
+- [ ] AdSense 신청
 
 ### 💡 아이디어
-- [ ] (여기에 추가 예정)
+- [ ] 뉴스레터 발송 자동화
+- [ ] 소셜 미디어 연동
 
 ---
 
@@ -146,6 +185,7 @@ const EMAILJS_CONFIG = {
 
 | 날짜 | 버전 | 변경 내용 |
 |------|------|----------|
+| 2026.01.19 | v2.3 | 수익화 준비 (GA4, 광고 슬롯, 개인정보처리방침, 이용약관, 푸터), posts.json 연동, Gemini 자동 글 생성 스크립트 추가 |
 | 2026.01.18 | v2.2 | 캐러셀 화살표 심플화, 한글 단어 해체 방지(word-break), 카테고리별 전체보기 페이지, 스크롤 탑 버튼, 다국어 지원(영어/중국어) 추가 |
 | 2026.01.18 | v2.1 | EmailJS 연동으로 구독 시 웰컴 이메일 자동 발송 기능 추가 |
 | 2026.01.18 | v2.0 | 카테고리 변경 (이달의 타입 → 라이프, 건강과 운동 → 브랜드), 샘플 콘텐츠 2000자 확장, 브랜드 카테고리 샘플 추가, 섹션 ID 수정으로 캐러셀 블랙아웃 오류 해결 |
@@ -157,8 +197,12 @@ const EMAILJS_CONFIG = {
 
 ```
 dod.mag/
-├── index.html          # 메인 웹페이지 (전체 코드)
-└── product_concept.md  # 제품 컨셉 및 작업 기록 (이 파일)
+├── index.html                    # 메인 웹페이지 (전체 코드)
+├── posts.json                    # 게시글 데이터 (Gemini 자동화용)
+├── product_concept.md            # 제품 컨셉 및 작업 기록 (이 파일)
+├── .gitignore                    # Git 제외 파일 목록
+└── automation/
+    └── gemini-auto-post.gs       # Gemini 자동 글 생성 스크립트
 ```
 
 ---
