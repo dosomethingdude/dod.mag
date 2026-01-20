@@ -2611,8 +2611,8 @@ dod.mag 드림
         }
 
         // 페이지 로드 시 초기화
-        window.addEventListener('load', function() {
-            loadPosts();
+        window.addEventListener('load', async function() {
+            await loadPosts();
             renderPosts();
             updateCarousel();
             loadLegalContent();
