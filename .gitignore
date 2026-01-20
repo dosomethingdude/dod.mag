@@ -11,3 +11,6 @@ Thumbs.db
 
 # Local development
 *.log
+
+# Personal work log (not for git)
+worklog.md

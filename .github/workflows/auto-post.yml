@@ -1,0 +1,50 @@
+name: Auto Generate Post
+
+on:
+  # 매일 한국 시간 오전 9시 실행 (UTC 0시)
+  schedule:
+    - cron: '0 0 * * *'
+  # 수동 실행 가능
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install xml2js
+
+      - name: Generate post with Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node automation/generate-posts.js
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet posts.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add posts.json
+          git commit -m "Auto-generated post $(date +'%Y-%m-%d')"
+          git push
