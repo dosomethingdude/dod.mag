@@ -121,8 +121,15 @@ KEYWORD: [선택한 키워드]`;
 async function generateArticle(keyword, category) {
   console.log(`Generating article for keyword: ${keyword}, category: ${category}`);
 
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDate = today.getDate();
+
   const prompt = `당신은 프리미엄 라이프스타일 매거진 "dod.mag"의 에디터입니다.
 Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
+
+**[필수] 오늘 날짜: ${currentYear}년 ${currentMonth}월 ${currentDate}일**
 
 주제: "${keyword}"
 카테고리: ${category}
@@ -135,13 +142,20 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
 5. 구체적인 데이터나 사례 인용
 6. 반드시 참고자료(출처) 포함
 
+**[필수] 날짜 검증 규칙:**
+- 제목과 본문에 연도를 언급할 때 반드시 ${currentYear}년 기준으로 작성
+- 과거 연도(2024년, 2025년 등)의 정보를 현재 시점인 것처럼 작성 금지
+- "올해", "최근" 등의 표현은 ${currentYear}년을 의미
+- 통계나 데이터 인용 시 ${currentYear}년 또는 ${currentYear - 1}년 자료 사용
+- 트렌드 키워드가 과거 이벤트라면, ${currentYear}년 관점에서 재해석하여 작성
+
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "title": "제목 (25-35자, 클릭 유도하되 낚시성 지양)",
+  "title": "제목 (25-35자, 클릭 유도하되 낚시성 지양, ${currentYear}년 기준)",
   "title_en": "English title",
   "summary": "요약 (100자 내외, 핵심 메시지 함축)",
   "summary_en": "English summary",
-  "content": "본문 (2000-2500자, 인트로-현상-분석-실천방안-클로징 구조, 마지막에 참고자료 섹션 포함)",
+  "content": "본문 (2000-2500자, 인트로-현상-분석-실천방안-클로징 구조, 마지막에 참고자료 섹션 포함, 모든 연도는 ${currentYear}년 기준)",
   "content_en": "English content (shortened version)",
   "sources": ["출처1", "출처2"]
 }`;
