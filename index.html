@@ -1637,8 +1637,8 @@
             const savedPosts = localStorage.getItem('dodmagPosts');
 
             try {
-                // posts.json에서 데이터 불러오기
-                const response = await fetch('posts.json');
+                // posts.json에서 데이터 불러오기 (캐시 버스팅 적용)
+                const response = await fetch('posts.json?v=' + Date.now());
                 if (response.ok) {
                     const jsonPosts = await response.json();
 
