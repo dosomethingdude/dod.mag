@@ -26,9 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm install xml2js
 
-      - name: Generate post with Gemini
+      - name: Generate post with Claude
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node automation/generate-posts.js
 
       - name: Check for changes

@@ -1,6 +1,6 @@
 /**
  * dod.mag 자동 글 생성 스크립트
- * GitHub Actions에서 실행되어 Gemini API로 글을 생성합니다.
+ * GitHub Actions에서 실행되어 Claude API로 글을 생성합니다.
  */
 
 const fs = require('fs');
@@ -9,7 +9,7 @@ const { parseString } = require('xml2js');
 
 // 설정
 const CONFIG = {
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   TRENDS_RSS_URL: 'https://trends.google.co.kr/trending/rss?geo=KR',
   POSTS_FILE: 'posts.json',
   CATEGORIES: ['인사이트', '신상품', '라이프', '브랜드'],
@@ -33,17 +33,15 @@ function httpGet(url) {
   });
 }
 
-// HTTP POST 요청 (Gemini API용)
-function httpPost(url, body) {
+// HTTP POST 요청 (Claude API용)
+function httpPost(url, body, headers) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
     const options = {
       hostname: urlObj.hostname,
       path: urlObj.pathname + urlObj.search,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers: headers
     };
 
     const req = https.request(options, (res) => {
@@ -86,7 +84,7 @@ async function fetchTrendKeywords() {
   });
 }
 
-// Gemini API로 카테고리에 맞는 키워드 선택
+// Claude API로 카테고리에 맞는 키워드 선택
 async function selectKeywordForCategory(keywords, category) {
   console.log(`Selecting keyword for category: ${category}`);
 
@@ -106,7 +104,7 @@ ${keywords.join('\n')}
 반드시 아래 형식으로만 응답하세요:
 KEYWORD: [선택한 키워드]`;
 
-  const response = await callGeminiAPI(prompt);
+  const response = await callClaudeAPI(prompt);
   const match = response.match(/KEYWORD:\s*(.+)/);
 
   if (match) {
@@ -119,7 +117,7 @@ KEYWORD: [선택한 키워드]`;
   return keywords[0];
 }
 
-// Gemini API로 글 생성
+// Claude API로 글 생성
 async function generateArticle(keyword, category) {
   console.log(`Generating article for keyword: ${keyword}, category: ${category}`);
 
@@ -148,7 +146,7 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
   "sources": ["출처1", "출처2"]
 }`;
 
-  const response = await callGeminiAPI(prompt);
+  const response = await callClaudeAPI(prompt);
 
   // JSON 추출
   const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -164,29 +162,34 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
   throw new Error('No valid JSON in response');
 }
 
-// Gemini API 호출
-async function callGeminiAPI(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+// Claude API 호출
+async function callClaudeAPI(prompt) {
+  const url = 'https://api.anthropic.com/v1/messages';
 
-  const body = {
-    contents: [{
-      parts: [{ text: prompt }]
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 4096
-    }
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': CONFIG.ANTHROPIC_API_KEY,
+    'anthropic-version': '2023-06-01'
   };
 
-  const response = await httpPost(url, body);
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    messages: [{
+      role: 'user',
+      content: prompt
+    }]
+  };
+
+  const response = await httpPost(url, body, headers);
 
   if (response.error) {
-    throw new Error(`Gemini API error: ${response.error.message}`);
+    throw new Error(`Claude API error: ${response.error.message}`);
   }
 
-  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+  const text = response.content?.[0]?.text;
   if (!text) {
-    throw new Error('Empty response from Gemini API');
+    throw new Error('Empty response from Claude API');
   }
 
   return text;
@@ -218,8 +221,8 @@ async function main() {
   console.log('=== dod.mag Auto Post Generator ===');
   console.log(`Date: ${getTodayDate()}`);
 
-  if (!CONFIG.GEMINI_API_KEY) {
-    console.error('ERROR: GEMINI_API_KEY is not set');
+  if (!CONFIG.ANTHROPIC_API_KEY) {
+    console.error('ERROR: ANTHROPIC_API_KEY is not set');
     process.exit(1);
   }
 
