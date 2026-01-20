@@ -1909,6 +1909,14 @@
             return post[field];
         }
 
+        // 마크다운을 HTML로 변환 (굵은체, 줄바꿈 처리)
+        function parseMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // **굵은체** → <strong>
+                .replace(/\n/g, '<br>');  // 줄바꿈 → <br>
+        }
+
         function renderPosts() {
             const t = translations[currentLang];
             Object.keys(categoryMap).forEach(category => {
@@ -1947,7 +1955,7 @@
             document.getElementById('modalCategory').textContent = translatedCategory;
             document.getElementById('modalTitle').textContent = getPostText(post, 'title');
             document.getElementById('modalDate').textContent = post.date;
-            document.getElementById('modalContent').textContent = getPostText(post, 'content');
+            document.getElementById('modalContent').innerHTML = parseMarkdown(getPostText(post, 'content'));
 
             const modalImage = document.getElementById('modalImage');
             if (post.image) {
