@@ -1,5 +1,70 @@
 [
     {
+        "id": 21,
+        "category": "신상품",
+        "title": "두쫀쿠 열풍: 쫀득한 식감이 디저트 시장을 점령하다",
+        "title_en": "Duzzoncou Craze: Chewy Texture Takes Over the Dessert Market",
+        "summary": "바삭함을 넘어 쫀득함의 시대. 두쫀쿠가 2026년 디저트 트렌드의 중심에 선 이유를 분석합니다.",
+        "summary_en": "Beyond crispy, the era of chewy. Analyzing why Duzzoncou stands at the center of 2026 dessert trends.",
+        "content": "쿠키는 바삭해야 한다는 고정관념이 깨지고 있습니다. '두쫀쿠(두툼하고 쫀득한 쿠키)'가 2026년 디저트 시장의 새로운 강자로 떠올랐습니다.\n\n**두쫀쿠란 무엇인가**\n\n두쫀쿠는 일반 쿠키보다 2-3배 두꺼운 두께에, 겉은 살짝 바삭하고 속은 촉촉하며 쫀득한 식감을 가진 쿠키입니다. 미국의 'Levain Bakery'와 'Crumbl Cookies'에서 시작된 이 트렌드는 한국에 상륙하며 폭발적인 인기를 얻고 있습니다.\n\n2025년 말부터 성수동, 연남동을 중심으로 두쫀쿠 전문점이 급증했고, 2026년 현재 전국에 약 500개 이상의 두쫀쿠 매장이 생겼습니다. 배달의민족 데이터에 따르면 2026년 1분기 쿠키 카테고리 주문량은 전년 대비 340% 증가했습니다.\n\n**왜 지금 두쫀쿠인가**\n\n전문가들은 두쫀쿠 열풍의 배경으로 '위안 소비(comfort consumption)'를 꼽습니다. 경제적 불확실성이 커진 시대에 사람들은 작지만 확실한 행복을 주는 소비에 집중합니다. 한 입 베어 물었을 때 느껴지는 쫀득한 식감과 녹아내리는 초콜릿의 조합은 즉각적인 만족감을 선사합니다.\n\n또한 SNS 시대의 특성도 한몫합니다. 두쫀쿠 특유의 '치즈풀' 같은 늘어나는 비주얼은 숏폼 영상에 최적화되어 있습니다. 틱톡과 인스타그램 릴스에서 #두쫀쿠 해시태그 조회수는 2억 건을 돌파했습니다.\n\n**주목할 두쫀쿠 브랜드**\n\n국내 두쫀쿠 시장을 이끄는 브랜드들이 있습니다. '청담쿠키'는 프리미엄 재료를 사용한 고급 라인으로 차별화했고, '쿠키몬스터'는 다양한 맛의 쿠키를 합리적인 가격에 제공합니다. 편의점 브랜드들도 가세했는데, CU의 '연세우유 두쫀쿠'는 출시 일주일 만에 50만 개가 판매되었습니다.\n\n**집에서 만드는 두쫀쿠**\n\n두쫀쿠의 핵심은 반죽을 냉장 휴지하는 것입니다. 최소 24시간, 가능하다면 72시간 냉장 휴지하면 글루텐이 이완되어 특유의 쫀득한 식감이 만들어집니다. 또한 굽는 온도는 높게(190-200도), 시간은 짧게(10-12분)하여 겉은 익히고 속은 촉촉하게 유지하는 것이 포인트입니다.\n\n**트렌드를 넘어 문화로**\n\n두쫀쿠는 단순한 디저트 트렌드를 넘어 하나의 문화 현상이 되었습니다. 친구와 나눠 먹기 좋은 크기, 선물하기 좋은 패키지, 그리고 무엇보다 한 입에 느껴지는 확실한 행복. 작은 사치가 주는 위안이 필요한 시대에, 두쫀쿠는 그 역할을 충실히 해내고 있습니다.\n\n---\n📚 참고자료\n- 배달의민족 (2026 디저트 트렌드 리포트)\n- 한국제과협회 (2025)\n- 메인 이미지: Unsplash @foodiesfeed",
+        "content_en": "The notion that cookies must be crispy is being shattered. 'Duzzoncou' (thick and chewy cookies) has emerged as the new powerhouse of the 2026 dessert market. Originating from Levain Bakery and Crumbl Cookies in the US, this trend exploded in Korea with over 500 specialty stores nationwide. Delivery app data shows cookie orders increased 340% in Q1 2026. Experts attribute this to 'comfort consumption'—people seeking small but certain happiness amid economic uncertainty. The chewy texture and melting chocolate provide instant gratification. SNS-optimized visuals with cheese-pull-like stretching have garnered over 200 million views on TikTok.",
+        "date": "2026.01.20",
+        "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&q=80",
+        "sources": ["배달의민족 (2026)", "한국제과협회 (2025)", "이미지: Unsplash @foodiesfeed"]
+    },
+    {
+        "id": 20,
+        "category": "신상품",
+        "title": "편의점의 진화: 2026년, 작은 공간이 만드는 큰 변화",
+        "title_en": "Evolution of Convenience Stores: Big Changes in Small Spaces in 2026",
+        "summary": "단순한 구매 공간을 넘어 라이프스타일 허브로 진화한 편의점. 2026년 편의점이 우리 일상에 가져온 변화를 살펴봅니다.",
+        "summary_en": "Beyond simple purchase spaces, convenience stores have evolved into lifestyle hubs. Examining the changes they've brought to our daily lives in 2026.",
+        "content": "편의점이 달라지고 있습니다. 단순히 음료와 과자를 사는 곳이 아닌, 식사를 해결하고, 택배를 보내고, 심지어 건강을 관리하는 공간으로 진화하고 있습니다.\n\n**편의점 도시락의 혁명**\n\n2026년 편의점 도시락의 평균 가격은 6,000원대로 올랐지만, 품질도 함께 상승했습니다. GS25의 '혜자로운 도시락'은 유명 셰프와 협업한 메뉴로 화제를 모았고, CU의 '델리 플레이트'는 백화점 델리 수준의 품질을 자랑합니다. 한국편의점산업협회에 따르면 2025년 편의점 도시락 시장 규모는 1조 5천억 원을 돌파했습니다.\n\n특히 '프리미엄 도시락' 카테고리가 급성장 중입니다. 1만 원 이상 가격대의 도시락 판매량이 전년 대비 67% 증가했습니다. \"편의점 도시락은 저렴해야 한다\"는 인식이 \"합리적인 가격에 좋은 품질\"로 바뀌고 있습니다.\n\n**건강과 웰니스의 접점**\n\n편의점은 건강 관리의 접점으로도 진화하고 있습니다. 세븐일레븐은 2026년부터 일부 매장에 '헬스 코너'를 도입해 혈압 측정기, 체성분 분석기를 설치했습니다. 영양제와 건강기능식품 코너도 확대되어, 이제 편의점에서 유산균부터 오메가3까지 구매할 수 있습니다.\n\n프로틴 제품의 성장도 주목할 만합니다. 프로틴 음료, 프로틴 바, 프로틴 과자까지. 편의점 프로틴 제품 매출은 2025년 대비 89% 증가했습니다. 운동 후 헬스장 옆 편의점에서 단백질을 보충하는 것이 자연스러운 루틴이 되었습니다.\n\n**라이프스타일 서비스 허브**\n\n편의점의 서비스 범위는 계속 확장 중입니다. 택배 발송과 수령은 기본이고, 세탁 서비스, 프린트 서비스, 심지어 자전거 수리 서비스를 제공하는 매장도 있습니다. 이마트24는 '생활 만물상' 콘셉트로 소형 생활용품부터 응급 의약품까지 갖추고 있습니다.\n\n무인 편의점도 급증하고 있습니다. 2026년 현재 전국 무인 편의점 수는 1만 개를 넘어섰습니다. 24시간 운영의 장점을 극대화하면서 인건비 문제를 해결한 모델입니다.\n\n**1인 가구의 냉장고**\n\n1인 가구 600만 시대, 편의점은 \"집 밖의 냉장고\" 역할을 합니다. 소포장 식재료, 1인분 밀키트, 소용량 반찬까지. 대형마트에서 대용량으로 사면 남기는 것들을 편의점에서 딱 필요한 만큼만 살 수 있습니다. 2025년 조사에서 1인 가구의 78%가 \"일주일에 3회 이상 편의점을 방문한다\"고 응답했습니다.\n\n편의점은 더 이상 '잠깐 들르는 곳'이 아닙니다. 우리 일상의 필수 인프라가 되었습니다.\n\n---\n📚 참고자료\n- 한국편의점산업협회 (2025 편의점 산업 보고서)\n- 닐슨코리아 (2026 유통 트렌드)\n- 메인 이미지: Unsplash @neonbrand",
+        "content_en": "Convenience stores are transforming—not just places to buy drinks and snacks, but spaces for meals, delivery, and even health management. The average convenience store lunch box price rose to 6,000 won but quality improved too. Premium lunch boxes over 10,000 won saw 67% sales growth. Health corners with blood pressure monitors and body composition analyzers are being introduced. Protein product sales increased 89% from 2025. Services now include delivery, laundry, printing, and even bicycle repair. For 6 million single-person households, convenience stores serve as 'refrigerators outside home'—78% visit 3+ times weekly.",
+        "date": "2026.01.20",
+        "image": "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80",
+        "sources": ["한국편의점산업협회 (2025)", "닐슨코리아 (2026)", "이미지: Unsplash @neonbrand"]
+    },
+    {
+        "id": 19,
+        "category": "브랜드",
+        "title": "탬버린즈가 향으로 공간을 디자인하는 법",
+        "title_en": "How Tamburins Designs Spaces Through Scent",
+        "summary": "한국에서 탄생한 니치 퍼퓸 브랜드 탬버린즈. 향기를 넘어 라이프스타일을 제안하는 브랜드의 철학을 탐구합니다.",
+        "summary_en": "Tamburins, a niche perfume brand born in Korea. Exploring the philosophy of a brand that proposes lifestyle beyond fragrance.",
+        "content": "탬버린즈(Tamburins) 매장에 들어서면 가장 먼저 눈에 띄는 것은 미니멀한 공간 디자인입니다. 그리고 곧 은은하게 퍼지는 향이 감각을 사로잡습니다. 이 브랜드가 한국 뷰티 시장에서 독보적인 위치를 차지하게 된 비결은 무엇일까요.\n\n**젠틀몬스터의 DNA**\n\n탬버린즈는 아이웨어 브랜드 젠틀몬스터의 모회사 아이아이컴바인드에서 2017년 론칭한 향수 브랜드입니다. 젠틀몬스터가 안경을 예술 작품처럼 전시하듯, 탬버린즈는 향수를 하나의 오브제로 제시합니다. 제품을 파는 것이 아니라 경험을 파는 것. 이것이 두 브랜드를 관통하는 철학입니다.\n\n**공간이 곧 브랜딩**\n\n탬버린즈 매장은 단순한 판매 공간이 아닙니다. 성수동 플래그십 스토어는 낡은 인쇄소를 개조한 공간으로, 콘크리트 벽과 자연 채광이 어우러진 갤러리 같은 분위기를 자아냅니다. 한남동 매장은 한옥의 요소를 현대적으로 재해석했습니다.\n\n2025년 인터브랜드 분석에 따르면, 탬버린즈는 \"공간 경험 만족도\" 항목에서 국내 뷰티 브랜드 중 1위를 기록했습니다. 방문객의 평균 체류 시간이 일반 화장품 매장의 3배에 달한다는 조사 결과도 있습니다.\n\n**향의 스토리텔링**\n\n탬버린즈의 향수 이름은 독특합니다. WOOD SEA SOUL, PUMKINI, LALE... 각 향수에는 고유한 서사가 담겨 있습니다. 단순히 \"이 향이 좋다\"를 넘어 \"이 향이 어떤 순간을 떠올리게 하는가\"를 이야기합니다. 2025년 가장 인기 있었던 BERGA SANDAL은 \"여름 끝자락, 모래사장에서 맡는 베르가못 향\"이라는 감성적 서사로 소비자들의 마음을 사로잡았습니다.\n\n**핸드크림의 재발견**\n\n탬버린즈를 대중에게 알린 것은 사실 향수보다 핸드크림입니다. 2-3만 원대의 핸드크림은 '작은 사치'로 자리잡았습니다. 특히 탬버린즈 핸드크림의 독특한 용기 디자인은 그 자체로 인테리어 소품이 됩니다. \"책상 위에 두고 싶은 핸드크림\"이라는 포지셔닝이 적중한 것입니다.\n\n**글로벌 확장**\n\n탬버린즈는 2024년 일본 도쿄 오모테산도에 첫 해외 매장을 오픈했고, 2025년에는 상하이, 방콕으로 확장했습니다. K-뷰티의 새로운 얼굴로서 글로벌 시장에서 주목받고 있습니다. 2026년에는 파리와 뉴욕 진출이 예정되어 있습니다.\n\n한국에서 시작한 니치 퍼퓸 브랜드가 세계 시장에서 인정받고 있다는 것. 탬버린즈의 성장은 K-브랜드의 가능성을 보여주는 사례입니다.\n\n---\n📚 참고자료\n- 인터브랜드 (2025 Korea Best Brands)\n- 아이아이컴바인드 공식 자료 (2026)\n- 메인 이미지: Unsplash @charissek",
+        "content_en": "Tamburins, launched in 2017 by Gentle Monster's parent company, treats perfume as objet d'art rather than just products. Their flagship stores in Seongsu-dong and Hannam-dong transform spaces into gallery-like experiences, ranking first in 'spatial experience satisfaction' among Korean beauty brands. Each perfume tells a unique story—BERGA SANDAL evokes 'bergamot scent on sandy beach at summer's end.' Their hand cream, priced at 20-30,000 won, became a 'small luxury' with container designs that double as interior decor. After opening in Tokyo (2024), Shanghai and Bangkok (2025), Paris and New York launches are planned for 2026.",
+        "date": "2026.01.19",
+        "image": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=1200&q=80",
+        "sources": ["인터브랜드 (2025)", "아이아이컴바인드 (2026)", "이미지: Unsplash @charissek"]
+    },
+    {
+        "id": 18,
+        "category": "브랜드",
+        "title": "오프화이트 이후, 스트리트 럭셔리의 새로운 지형도",
+        "title_en": "After Off-White: The New Landscape of Street Luxury",
+        "summary": "버질 아블로가 떠난 자리, 스트리트 럭셔리는 어디로 향하고 있을까요. 2026년 패션계의 새로운 흐름을 분석합니다.",
+        "summary_en": "Where is street luxury heading after Virgil Abloh's departure? Analyzing new fashion trends in 2026.",
+        "content": "2021년 버질 아블로의 갑작스러운 타계 이후, 스트리트 럭셔리 시장은 전환기를 맞이했습니다. 오프화이트(Off-White)가 정의한 \"하이패션과 스트리트웨어의 경계 허물기\"는 이제 패션계의 상식이 되었습니다. 그렇다면 2026년, 스트리트 럭셔리는 어디로 향하고 있을까요.\n\n**버질 아블로의 유산**\n\n버질 아블로는 단순한 디자이너가 아니었습니다. 그는 패션의 민주화를 실현한 혁명가였습니다. 후드티에 \"DEFINING\"이라는 텍스트를 프린트하고, 나이키 스니커즈를 해체하고 재구성한 그의 접근법은 \"패션은 누구나 참여할 수 있다\"는 메시지를 담고 있었습니다.\n\n그의 영향력은 숫자로도 증명됩니다. 2025년 패션 검색 플랫폼 리스트(Lyst)에 따르면, \"스트리트 럭셔리\" 관련 검색량은 10년 전 대비 400% 증가했습니다. 오프화이트가 개척한 시장이 이제 하나의 카테고리로 자리 잡은 것입니다.\n\n**떠오르는 새로운 이름들**\n\n버질 이후의 공백을 채우는 새로운 브랜드들이 등장했습니다. 아워레가시(Our Legacy)는 스칸디나비아 특유의 미니멀리즘과 스트리트웨어를 결합해 주목받고 있습니다. 웨일즈 보너(Wales Bonner)는 아프리카 디아스포라 문화를 럭셔리 패션에 녹여내며 새로운 담론을 만들고 있습니다.\n\n한국에서는 앰부시(AMBUSH)의 윤안(Yoon Ahn)이 주목받고 있습니다. 디올 맨의 주얼리 디자인을 담당하며 K-디자이너의 글로벌 영향력을 보여주고 있습니다.\n\n**조용한 럭셔리와의 공존**\n\n흥미로운 것은 스트리트 럭셔리와 '콰이어트 럭셔리(Quiet Luxury)'가 공존하고 있다는 점입니다. 과시적인 로고와 화려한 그래픽을 선호하는 소비자와, 절제된 우아함을 추구하는 소비자가 동시에 존재합니다. 2026년 패션 시장은 이 두 흐름이 균형을 이루며 다양성이 확대되는 양상을 보입니다.\n\n**지속가능성이라는 새로운 기준**\n\n스트리트 럭셔리도 지속가능성을 피해갈 수 없습니다. 오프화이트는 2025년 재활용 소재를 활용한 컬렉션을 발표했고, 슈프림은 빈티지 소재를 활용한 리에디션 라인을 출시했습니다. 환경을 생각하지 않는 브랜드는 젊은 소비자들에게 외면받는 시대가 되었습니다.\n\n**앞으로의 방향**\n\n스트리트 럭셔리의 미래는 \"경계 없음\"에 있습니다. 성별의 경계, 장르의 경계, 그리고 가격의 경계까지. 버질 아블로가 시작한 혁명은 계속되고 있습니다. 패션이 자신을 표현하는 언어라면, 그 문법은 이제 더욱 자유로워지고 있습니다.\n\n---\n📚 참고자료\n- Lyst (2025 Fashion Search Report)\n- Business of Fashion (2026)\n- 메인 이미지: Unsplash @mnzoutfit",
+        "content_en": "After Virgil Abloh's passing in 2021, street luxury entered a transitional period. Off-White's approach of blurring lines between high fashion and streetwear has become industry standard. According to Lyst, 'street luxury' searches increased 400% over 10 years. New brands filling the void include Our Legacy combining Scandinavian minimalism with streetwear, and Wales Bonner weaving African diaspora culture into luxury fashion. Korean designer Yoon Ahn of AMBUSH is gaining attention designing jewelry for Dior Men. Interestingly, street luxury now coexists with quiet luxury, expanding market diversity. Sustainability has also become essential—brands ignoring environmental concerns face rejection from young consumers.",
+        "date": "2026.01.18",
+        "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&q=80",
+        "sources": ["Lyst (2025)", "Business of Fashion (2026)", "이미지: Unsplash @mnzoutfit"]
+    },
+    {
+        "id": 17,
+        "category": "브랜드",
+        "title": "유니클로가 증명한 것: 기본의 힘은 어디서 오는가",
+        "title_en": "What Uniqlo Has Proven: Where the Power of Basics Comes From",
+        "summary": "화려함 대신 본질을 택한 브랜드. 유니클로가 40년간 '기본'으로 글로벌 패션 시장을 정복한 비결을 분석합니다.",
+        "summary_en": "A brand that chose essence over glamour. Analyzing how Uniqlo conquered the global fashion market with 'basics' for 40 years.",
+        "content": "유니클로(UNIQLO) 매장에는 트렌디한 것이 없습니다. 화려한 프린트도, 파격적인 실루엣도 찾아보기 어렵습니다. 그런데 왜 전 세계 2,400개 이상의 매장을 운영하는 글로벌 브랜드가 되었을까요. 유니클로는 '기본'이라는 가치로 패션의 본질을 재정의했습니다.\n\n**'LifeWear'라는 철학**\n\n유니클로의 슬로건은 'LifeWear, 삶을 위한 옷'입니다. 패션이 아닌 생활을 위한 옷. 이 단순한 선언에 브랜드의 모든 철학이 담겨 있습니다. 창립자 야나이 다다시 회장은 \"사람들은 옷을 입기 위해 사는 것이 아니라, 살기 위해 옷을 입는다\"고 말했습니다.\n\n2025년 패션 산업 분석 기관 유로모니터에 따르면, 유니클로의 모회사 패스트리테일링은 글로벌 의류 기업 시가총액 3위를 기록했습니다. 자라(Zara)와 H&M이 트렌드를 쫓는 동안, 유니클로는 변하지 않는 기본에 집중하며 성장했습니다.\n\n**기술로 완성하는 기본**\n\n유니클로의 '기본'은 단순함이 아닙니다. 그 안에는 첨단 기술이 숨어 있습니다. 히트텍(HEATTECH)은 체온으로 발열하는 소재 기술을, 에어리즘(AIRism)은 빠른 흡습과 속건 기능을 구현했습니다. 이러한 기능성 소재는 유니클로만의 독자적인 경쟁력입니다.\n\n2026년 현재 히트텍 누적 판매량은 전 세계 15억 장을 돌파했습니다. 매년 겨울이면 히트텍을 찾는 소비자들이 있다는 것은, '기본'이 결코 대체 불가능한 것임을 증명합니다. 기술은 보이지 않지만, 입는 순간 느껴지는 차이. 이것이 유니클로가 추구하는 방향입니다.\n\n**콜라보레이션의 재정의**\n\n유니클로의 콜라보레이션 전략도 독특합니다. 럭셔리 브랜드와의 협업이 아닌, 디자이너의 철학을 대중화하는 방식을 택했습니다. 크리스토퍼 르메르, 질 샌더, 마르니와의 협업은 \"좋은 디자인은 모두의 것이어야 한다\"는 메시지를 전달합니다.\n\n특히 '유니클로 유(Uniqlo U)' 라인은 에르메스 출신 디자이너 크리스토퍼 르메르가 이끌며, 매 시즌 높은 완성도로 주목받습니다. 럭셔리 디자인을 합리적인 가격에 제공한다는 것. 이 가치는 2026년에도 여전히 유효합니다.\n\n**지속가능성으로의 전환**\n\n유니클로는 지속가능성에서도 진정성을 보여주고 있습니다. 2025년 전 세계 매장에 의류 수거함을 설치하고, 수거된 옷을 난민 지원에 활용하는 프로그램을 확대했습니다. RE.UNIQLO 라인은 수거된 다운 제품을 재활용해 새 제품으로 만듭니다.\n\n2026년까지 전 제품의 50%를 재생 소재로 전환하겠다는 목표도 발표했습니다. 빠른 유행 주기를 따르는 패스트 패션에 대한 비판 속에서, 유니클로는 \"오래 입을 수 있는 기본\"이라는 대안을 제시합니다.\n\n**왜 기본은 강한가**\n\n유니클로의 성공이 말해주는 것은 명확합니다. 트렌드는 변하지만, 좋은 품질의 기본 아이템에 대한 수요는 변하지 않는다는 것. 흰 티셔츠, 청바지, 기능성 이너웨어... 이것들은 유행을 타지 않습니다.\n\n\"특별해지려고 노력하지 마라. 대신 본질에 집중하라.\" 유니클로가 40년간 지켜온 이 원칙은, 패션을 넘어 삶의 태도에 대한 영감을 줍니다.\n\n---\n📚 참고자료\n- Euromonitor International (2025 Global Apparel Report)\n- Fast Retailing 연간 보고서 (2025)\n- 이미지: Unsplash @markuswinkler",
+        "content_en": "UNIQLO stores have nothing trendy—no flashy prints or avant-garde silhouettes. Yet they operate over 2,400 stores worldwide. UNIQLO redefined fashion's essence with 'basics.' Their slogan 'LifeWear, clothes for life' encapsulates their philosophy: people wear clothes to live, not live to wear clothes. According to Euromonitor 2025, parent company Fast Retailing ranks third globally in apparel market cap. HEATTECH, generating heat from body temperature, has sold over 1.5 billion units worldwide. Collaborations with designers like Christophe Lemaire democratize good design at reasonable prices. Sustainability initiatives include clothing collection boxes in all stores and the RE.UNIQLO recycling program, with a goal to use 50% recycled materials by 2026. UNIQLO proves that demand for quality basics never changes.",
+        "date": "2026.01.17",
+        "image": "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1200&q=80",
+        "sources": ["Euromonitor International (2025)", "Fast Retailing 연간 보고서 (2025)", "이미지: Unsplash @markuswinkler"]
+    },
+    {
         "id": 16,
         "category": "라이프",
         "title": "디지털 디톡스의 역설: 연결을 끊어야 진짜 연결이 시작된다",
@@ -10,7 +75,7 @@
         "content_en": "Checking our smartphones the moment we wake up has become routine. According to a 2025 survey, Korean adults spend an average of 4 hours and 32 minutes daily on their phones. Paradoxically, in this 24/7 connected world, people report feeling lonelier than ever. A 2026 study found that 67% of respondents in their 20s-30s felt isolated while using social media. The concept of 'digital detox' in 2026 focuses not on complete disconnection but on intentional use. Research shows that those who spend 2 hours offline daily experienced 34% better sleep quality and 28% higher satisfaction in face-to-face relationships. Practical tips include creating tech-free zones, reviewing notification settings, and developing offline hobbies. The ultimate goal isn't rejecting technology but building a healthier relationship with it.",
         "date": "2026.01.20",
         "image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
-        "sources": ["한국정보화진흥원 (2025)", "서울대학교 행복연구센터 (2026)", "Calm Global Wellness Report (2026)"]
+        "sources": ["한국정보화진흥원 (2025)", "서울대학교 행복연구센터 (2026)", "Calm Global Wellness Report (2026)", "이미지: Unsplash @nickmorrison"]
     },
     {
         "id": 15,
@@ -23,7 +88,7 @@
         "content_en": "The days of saying 'turn off the lights' are over. Smart homes in 2026 know what you need before you ask. Samsung's SmartThings AI Home and LG's ThinQ 3.0 have set new standards with 'context awareness' technology that analyzes time, weather, and behavioral patterns to automatically configure optimal environments. According to a 2025 survey, 82% of AI-based smart home users reported improved daily rhythms. Energy optimization is also central, with AI smart home systems reducing power consumption by an average of 23%. Privacy concerns are addressed through 'on-device AI' processing and standardized 'privacy mode' features. Starting small with smart lighting or plugs is recommended for beginners.",
         "date": "2026.01.19",
         "image": "https://images.unsplash.com/photo-1558002038-1055907df827?w=1200&q=80",
-        "sources": ["한국스마트홈산업협회 (2025)", "한국에너지공단 (2025)", "Samsung & LG 공식 자료 (2026)"]
+        "sources": ["한국스마트홈산업협회 (2025)", "한국에너지공단 (2025)", "Samsung & LG 공식 자료 (2026)", "이미지: Unsplash @bfriedrich"]
     },
     {
         "id": 14,
@@ -36,7 +101,7 @@
         "content_en": "The first thing you notice when entering an Aesop store is the scent—subtle but distinct. Founded in Melbourne in 1987, Aesop has grown without flashy campaigns or celebrity endorsements, instead investing in 'consistency of experience.' Their 400+ stores worldwide each have unique designs but share a common sensory identity. Founder Dennis Paphitis says they sell 'daily rituals,' not skincare products. Each store respects local context while maintaining brand consistency through amber bottles, warm lighting, and signature scents. Interbrand's 2025 analysis ranked Aesop first in 'spatial experience consistency' among luxury beauty brands. The brand's 'slow growth' strategy has paradoxically made it stronger, creating timeless appeal.",
         "date": "2026.01.18",
         "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=1200&q=80",
-        "sources": ["Interbrand (2025)", "Aesop 지속가능성 보고서 (2025)", "Business of Fashion (2025)"]
+        "sources": ["Interbrand (2025)", "Aesop 지속가능성 보고서 (2025)", "Business of Fashion (2025)", "이미지: Unsplash @jupp"]
     },
     {
         "id": 13,
@@ -49,7 +114,7 @@
         "content_en": "Single-person households in Korea surpassed 6 million in 2026, representing about 32% of all households. This isn't just a demographic change but a massive shift reshaping the entire consumer market. Unlike before, 58% of single-person households in their 20s-30s say they 'voluntarily chose' this lifestyle. These 'solos' prioritize emotional satisfaction over cost-effectiveness, willingly spending on premium products designed for one. The housing market is adapting with small apartments and co-living spaces. The food industry is at the forefront, with convenience store meals and single-portion meal kits growing rapidly. While social isolation remains a concern, various community services are emerging to help people live alone without feeling lonely.",
         "date": "2026.01.17",
         "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80",
-        "sources": ["통계청 (2026)", "한국부동산원 (2025)", "한국농수산식품유통공사 (2025)", "보건복지부 (2025)"]
+        "sources": ["통계청 (2026)", "한국부동산원 (2025)", "한국농수산식품유통공사 (2025)", "보건복지부 (2025)", "이미지: Unsplash @brenoassis"]
     },
     {
         "id": 12,
@@ -62,7 +127,7 @@
         "content_en": "The Korean saying '4-dang-5-rak' suggested sleeping only 4 hours leads to success, while 5 hours leads to failure. But in 2026, this formula has been completely reversed. WHO's 2025 report revealed that chronic sleep deprivation increases dementia risk by 40% and cardiovascular disease risk by 34%. The change started in Silicon Valley, where CEOs began publicly stating they sleep 8 hours. Jeff Bezos maintains 8 hours of sleep, calling the idea of working more by sleeping less 'an illusion.' The Sleep Tech market is booming, with personalized AI sleep coaching services gaining attention in 2026. Good sleep hygiene includes consistent sleep times, avoiding screens before bed, and keeping the bedroom for sleep only.",
         "date": "2026.01.16",
         "image": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=1200&q=80",
-        "sources": ["WHO (2025)", "한국수면학회 (2025)", "대한상공회의소 (2026)", "Grand View Research (2025)"]
+        "sources": ["WHO (2025)", "한국수면학회 (2025)", "대한상공회의소 (2026)", "Grand View Research (2025)", "이미지: Unsplash @kalenemsley"]
     },
     {
         "id": 11,
@@ -75,7 +140,7 @@
         "content_en": "When asked about EVs, people often worry about charging inconvenience. Refueling takes 5 minutes at a gas station, but charging could take 30+ minutes. In 2026, this is changing. Hyundai's Ioniq 7 can travel 350km with just 10 minutes of charging, thanks to 800V high-voltage systems and silicon carbide semiconductors. Korea's EV chargers reached 250,000 units by end of 2025, doubling in two years. Battery technology is also evolving, with LFP batteries for affordability and solid-state batteries for premium models. Korean companies hold 27% of the global EV battery market. Tips for potential buyers: check local charging infrastructure, verify subsidy policies (up to 8 million won), and compare charging speeds when choosing a model.",
         "date": "2026.01.15",
         "image": "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80",
-        "sources": ["환경부 (2025)", "현대자동차 (2026)", "한국배터리산업협회 (2025)", "IEA (2025)"]
+        "sources": ["환경부 (2025)", "현대자동차 (2026)", "한국배터리산업협회 (2025)", "IEA (2025)", "이미지: Unsplash @chuttersnap"]
     },
     {
         "id": 10,
@@ -88,7 +153,7 @@
         "content_en": "MUJI products have no logos, no flashy colors—only natural material colors and simple forms. MUJI (無印良品) means 'quality goods without a brand' in Japanese. Starting in 1980 as a private brand during Japan's luxury consumption peak, MUJI pursued an 'anti-brand' philosophy: 'cheap for a reason.' Designer Kenya Hara's concept of 'empty vessel' means MUJI products should be backgrounds that hold users' lives. MUJI practiced sustainability long before it became trendy, minimizing packaging and using recycled materials. Their 2026 'zero waste stores' sell refills and run 'MUJI RETURN' for secondhand products. Instead of traditional advertising, MUJI lets store experiences and products speak for themselves.",
         "date": "2026.01.14",
         "image": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80",
-        "sources": ["하라 켄야 (2020)", "MUJI 지속가능성 보고서 (2025)", "Nikkei Asia (2025)"]
+        "sources": ["하라 켄야 (2020)", "MUJI 지속가능성 보고서 (2025)", "Nikkei Asia (2025)", "이미지: Unsplash @phillipgold"]
     },
     {
         "id": 9,
@@ -101,7 +166,7 @@
         "content_en": "More people are choosing Michelin dinners over luxury bags, Antarctic trips over expensive watches. Psychologists call this 'hedonic adaptation'—happiness from purchases fades quickly. However, Cornell professor Thomas Gilovich's research shows experiences bring longer, stronger happiness because they become stories and part of our identity. McKinsey's 2025 report found 74% of millennials and Gen Z prefer spending on experiences over things. In Korea, travel, concerts, and dining spending increased 23% while clothing decreased 8% for people in their 20s-30s. Experience consumption is also becoming premium—private tours, VIP seats, chef's tables. Even gift-giving is changing, with 'experience voucher' transactions up 67% on Kakao Gift.",
         "date": "2026.01.13",
         "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-        "sources": ["McKinsey & Company (2025)", "신한카드 빅데이터센터 (2025)", "Cornell University (2024)", "카카오 (2025)"]
+        "sources": ["McKinsey & Company (2025)", "신한카드 빅데이터센터 (2025)", "Cornell University (2024)", "카카오 (2025)", "이미지: Unsplash @neloang"]
     },
     {
         "id": 8,
@@ -116,7 +181,8 @@
         "image": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80",
         "sources": [
             "국세청 홈택스 연말정산 가이드 (2026)",
-            "국세통계연보 (2025)"
+            "국세통계연보 (2025)",
+            "이미지: Unsplash @absurdistwords"
         ]
     },
     {
@@ -130,7 +196,7 @@
         "content_en": "As 2026 begins, the consumer market is undergoing another transformation. Despite ongoing economic uncertainty, consumers aren't simply closing their wallets—they're shifting toward smarter, more meaningful consumption. Key trends include: value-based consumption where 73% prioritize meaning over price; acceleration of experience economy; personalization through AI; balance between local and global brands; and practical sustainability actions. These trends point to consumers becoming active agents expressing their values rather than passive buyers.",
         "date": "2026.01.15",
         "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
-        "sources": ["대한상공회의소 (2025)", "트렌드코리아 2026", "McKinsey (2025)"]
+        "sources": ["대한상공회의소 (2025)", "트렌드코리아 2026", "McKinsey (2025)", "이미지: Unsplash @blakewisz"]
     },
     {
         "id": 2,
@@ -143,7 +209,7 @@
         "content_en": "The definition of luxury is changing. Instead of ostentatious logos and flashy decorations, 'Quiet Luxury' pursuing understated elegance has emerged as a new trend. According to Bain & Company's 2025 report, sales of 'logoless' products increased 28% year-over-year. Interestingly, Gen Z is leading this trend—62% say quality and durability matter more than brand logos. This represents a shift from material possession to experiential value, where what you've 'experienced' becomes the new social currency rather than what you 'own.' Quiet luxury also connects with sustainability through timeless designs and high-quality materials.",
         "date": "2026.01.14",
         "image": "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&q=80",
-        "sources": ["Bain & Company (2025)", "Deloitte (2025)", "Business of Fashion (2025)"]
+        "sources": ["Bain & Company (2025)", "Deloitte (2025)", "Business of Fashion (2025)", "이미지: Unsplash @anomaly"]
     },
     {
         "id": 3,
@@ -156,7 +222,7 @@
         "content_en": "As of 2026, AI can write articles, create art, and compose music. Interestingly, the 'made by humans' label is gaining premium value. About 40% of internet content is now AI-assisted, yet paradoxically, finding 'worth reading' content has become harder. Some platforms have introduced '100% Human Written' labels, similar to organic food labels. The key is 'authenticity'—AI can learn patterns but cannot create stories from real experience. The future will be coexistence, not replacement: AI handles repetitive mass production while humans focus on deep, meaningful content creation.",
         "date": "2026.01.13",
         "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-        "sources": ["Reuters Institute (2025)", "MIT Technology Review (2025)", "한국콘텐츠진흥원 (2025)"]
+        "sources": ["Reuters Institute (2025)", "MIT Technology Review (2025)", "한국콘텐츠진흥원 (2025)", "이미지: Unsplash @possessedphotography"]
     },
     {
         "id": 4,
@@ -169,7 +235,7 @@
         "content_en": "Among countless IT products released each year, only a few truly change our lives. In 2026, we've selected noteworthy products where technology and design converge: Samsung Galaxy Ring 2 brings advanced health tracking to your finger; Apple Vision Pro 2 makes spatial computing more accessible; Dyson Airwrap i.d. uses AI to learn your styling preferences; Sony WF-1000XM6 perfects noise cancellation with adaptive AI sound; LG StanbyME 2 Pro redefines portable screens. The common thread: technology for life, not technology for technology's sake.",
         "date": "2026.01.12",
         "image": "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&q=80",
-        "sources": ["CES 2026", "The Verge (2026)", "CNET (2026)"]
+        "sources": ["CES 2026", "The Verge (2026)", "CNET (2026)", "이미지: Unsplash @weirick"]
     },
     {
         "id": 5,
@@ -182,7 +248,7 @@
         "content_en": "NEAT (Non-Exercise Activity Thermogenesis) refers to calories burned through everyday activities: climbing stairs, standing work, housework, walking. Mayo Clinic research shows NEAT differences alone can vary daily energy expenditure by up to 2,000kcal. The problem is modern life minimizes NEAT—cars, elevators, delivery apps, remote work. Korean office workers now sit an average of 9.5 hours daily, up 1.5 hours from five years ago. Simple solutions include standing desks (50kcal/hour more), phone walks (100kcal per 30-min call), and deliberately choosing slight inconveniences. NEAT offers a sustainable alternative to exercise obsession.",
         "date": "2026.01.11",
         "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80",
-        "sources": ["Mayo Clinic (2025)", "한국건강증진개발원 (2025)", "Harvard Health (2025)"]
+        "sources": ["Mayo Clinic (2025)", "한국건강증진개발원 (2025)", "Harvard Health (2025)", "이미지: Unsplash @brucemars"]
     },
     {
         "id": 6,
@@ -195,6 +261,6 @@
         "content_en": "\"Don't Buy This Jacket.\" On Black Friday 2011, Patagonia ran a full-page ad in the New York Times telling customers not to buy their products unless truly needed. After this campaign, sales actually increased 30%. In 2022, founder Yvon Chouinard donated the entire company to environmental causes, declaring \"Earth is our only shareholder.\" The 'Worn Wear' program extends product life through free repairs and secondhand sales, with about 1 million products given extended life by 2025. Patagonia fully discloses its supply chain and donates Black Friday sales to environmental groups. Their success poses an uncomfortable question to other brands: Are you acting as you speak?",
         "date": "2026.01.10",
         "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80",
-        "sources": ["Patagonia 환경 보고서 (2025)", "Harvard Business Review (2025)", "Fast Company (2025)"]
+        "sources": ["Patagonia 환경 보고서 (2025)", "Harvard Business Review (2025)", "Fast Company (2025)", "이미지: Unsplash @lgnwvr"]
     }
 ]
