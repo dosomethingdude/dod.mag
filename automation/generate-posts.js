@@ -166,7 +166,7 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
 
 // Gemini API 호출
 async function callGeminiAPI(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
   const body = {
     contents: [{
