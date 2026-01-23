@@ -1,9 +1,9 @@
 name: Auto Generate Post
 
 on:
-  # 매일 한국 시간 오전 9시 실행 (UTC 0시)
+  # 매일 한국 시간 오전 6시 실행 (UTC 21시)
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 21 * * *'
   # 수동 실행 가능
   workflow_dispatch:
 
