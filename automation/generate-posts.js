@@ -327,7 +327,7 @@ async function main() {
         content: article.content,
         content_en: article.content_en,
         date: getTodayDate(),
-        image: getDefaultImage(category),
+        image: getDefaultImage(category, [...posts, ...newPosts]),
         sources: article.sources || [],
         admin_locked: false  // 관리자 수정 우선권 플래그 (false = 자동 업데이트 가능)
       };
@@ -361,42 +361,85 @@ async function main() {
 }
 
 // 카테고리별 기본 이미지 (Unsplash - 저작권 무료)
-// 다양한 이미지 풀에서 랜덤 선택하여 중복 방지
-function getDefaultImage(category) {
-  const imagePool = {
-    '인사이트': [
-      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80',
-      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80',
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
-      'https://images.unsplash.com/photo-1553484771-371a605b060b?w=1200&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80'
-    ],
-    '신상품': [
-      'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&q=80',
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80',
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&q=80',
-      'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200&q=80',
-      'https://images.unsplash.com/photo-1491553895911-0055uj881c60?w=1200&q=80'
-    ],
-    '라이프': [
-      'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
-      'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
-      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80',
-      'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
-      'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=1200&q=80'
-    ],
-    '브랜드': [
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80',
-      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
-      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
-      'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80',
-      'https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=1200&q=80'
-    ]
-  };
+// 이미지 풀 확장 + 기존 게시글과 중복 방지 로직 포함
+const IMAGE_POOL = {
+  '인사이트': [
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80',
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80',
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1553484771-371a605b060b?w=1200&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80',
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
+    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80',
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80'
+  ],
+  '신상품': [
+    'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&q=80',
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80',
+    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&q=80',
+    'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1491553895911-0055uj881c60?w=1200&q=80',
+    'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=1200&q=80',
+    'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=1200&q=80',
+    'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=1200&q=80',
+    'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=1200&q=80',
+    'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=1200&q=80'
+  ],
+  '라이프': [
+    'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
+    'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
+    'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80',
+    'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+    'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=1200&q=80',
+    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
+    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
+    'https://images.unsplash.com/photo-1507120410856-1f35574c3b45?w=1200&q=80',
+    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200&q=80',
+    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=80'
+  ],
+  '브랜드': [
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80',
+    'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
+    'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80',
+    'https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=1200&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80',
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
+    'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1200&q=80',
+    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80'
+  ]
+};
 
-  const pool = imagePool[category] || imagePool['인사이트'];
-  const randomIdx = Math.floor(Math.random() * pool.length);
-  return pool[randomIdx];
+// 사용된 이미지 추적 (세션 내 중복 방지)
+let usedImagesInSession = [];
+
+// 기존 게시글에서 사용 중인 이미지 목록 가져오기
+function getUsedImages(posts) {
+  return posts.map(p => p.image).filter(Boolean);
+}
+
+// 중복 방지 이미지 선택
+function getDefaultImage(category, existingPosts = []) {
+  const pool = IMAGE_POOL[category] || IMAGE_POOL['인사이트'];
+  const usedImages = [...getUsedImages(existingPosts), ...usedImagesInSession];
+
+  // 사용되지 않은 이미지 필터링
+  const availableImages = pool.filter(img => !usedImages.includes(img));
+
+  // 모든 이미지가 사용된 경우 전체 풀에서 랜덤 선택 (순환)
+  const selectedPool = availableImages.length > 0 ? availableImages : pool;
+
+  const randomIdx = Math.floor(Math.random() * selectedPool.length);
+  const selectedImage = selectedPool[randomIdx];
+
+  // 세션 내 사용 기록
+  usedImagesInSession.push(selectedImage);
+
+  console.log(`Selected image for ${category}: ${selectedImage.split('/').pop().split('?')[0]}`);
+  return selectedImage;
 }
 
 // 실행
