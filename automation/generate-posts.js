@@ -327,10 +327,13 @@ async function main() {
         content: article.content,
         content_en: article.content_en,
         date: getTodayDate(),
-        image: getDefaultImage(category, [...posts, ...newPosts]),
+        image: getDefaultImage(category, [...posts, ...newPosts], article.title, keyword),
         sources: article.sources || [],
         admin_locked: false  // 관리자 수정 우선권 플래그 (false = 자동 업데이트 가능)
       };
+
+      // 이미지-콘텐츠 주제 일치 검증
+      validateImageContentMatch(newPost);
 
       newPosts.push(newPost);
       console.log(`Generated: ${newPost.title}`);
@@ -359,6 +362,69 @@ async function main() {
     process.exit(1);
   }
 }
+
+// 키워드별 맞춤 이미지 (콘텐츠-이미지 주제 일치 검증용)
+const KEYWORD_IMAGE_MAP = {
+  // 의료/건강 관련
+  '의료': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
+  '병원': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
+  '드라마': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
+  '건강': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
+  '웰빙': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+
+  // 배터리/전기차/에너지
+  '배터리': 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=1200&q=80',
+  '전기차': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  'EV': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  '충전': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  '에너지': 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=1200&q=80',
+
+  // 쇼핑/소비
+  '홈쇼핑': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+  '쇼핑': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+  '소비': 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
+  '편의점': 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80',
+
+  // 금융/투자
+  '연말정산': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
+  '세금': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
+  '투자': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+  '엔화': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+  '금융': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+
+  // IT/기술
+  'AI': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
+  '인공지능': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
+  '스마트폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+  'iPhone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+  '아이폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+  '로봇': 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
+
+  // 음식/식품
+  '음식': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
+  '식품': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
+  '쿠키': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&q=80',
+  '디저트': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&q=80',
+  '컬리': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
+
+  // 패션/뷰티
+  '패션': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
+  '향수': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=1200&q=80',
+  '뷰티': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&q=80',
+  '유니클로': 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1200&q=80',
+
+  // 교육
+  '교육': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
+  '인강': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
+  '학습': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
+
+  // 라이프스타일
+  '운동': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
+  '헬스': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
+  '수면': 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=1200&q=80',
+  '1인가구': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
+  '디톡스': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80'
+};
 
 // 카테고리별 기본 이미지 (Unsplash - 저작권 무료)
 // 이미지 풀 확장 + 기존 게시글과 중복 방지 로직 포함
@@ -421,8 +487,37 @@ function getUsedImages(posts) {
   return posts.map(p => p.image).filter(Boolean);
 }
 
-// 중복 방지 이미지 선택
-function getDefaultImage(category, existingPosts = []) {
+// 키워드 기반 이미지 매칭 (콘텐츠-이미지 주제 일치 검증)
+function getKeywordMatchedImage(title, keyword, existingPosts = []) {
+  const usedImages = [...getUsedImages(existingPosts), ...usedImagesInSession];
+  const searchText = `${title} ${keyword}`.toLowerCase();
+
+  // 키워드 매칭 우선순위로 이미지 선택
+  for (const [key, imageUrl] of Object.entries(KEYWORD_IMAGE_MAP)) {
+    if (searchText.includes(key.toLowerCase())) {
+      // 중복 체크
+      if (!usedImages.includes(imageUrl)) {
+        console.log(`Keyword matched image for "${key}": ${imageUrl.split('/').pop().split('?')[0]}`);
+        usedImagesInSession.push(imageUrl);
+        return imageUrl;
+      }
+    }
+  }
+
+  return null; // 매칭 실패시 null 반환
+}
+
+// 중복 방지 이미지 선택 (키워드 매칭 우선)
+function getDefaultImage(category, existingPosts = [], title = '', keyword = '') {
+  // 1. 먼저 키워드 기반 매칭 시도
+  if (title || keyword) {
+    const matchedImage = getKeywordMatchedImage(title, keyword, existingPosts);
+    if (matchedImage) {
+      return matchedImage;
+    }
+  }
+
+  // 2. 키워드 매칭 실패시 카테고리 기반 선택
   const pool = IMAGE_POOL[category] || IMAGE_POOL['인사이트'];
   const usedImages = [...getUsedImages(existingPosts), ...usedImagesInSession];
 
@@ -438,8 +533,38 @@ function getDefaultImage(category, existingPosts = []) {
   // 세션 내 사용 기록
   usedImagesInSession.push(selectedImage);
 
-  console.log(`Selected image for ${category}: ${selectedImage.split('/').pop().split('?')[0]}`);
+  console.log(`Category fallback image for ${category}: ${selectedImage.split('/').pop().split('?')[0]}`);
   return selectedImage;
+}
+
+// 콘텐츠-이미지 주제 일치 검증 함수
+function validateImageContentMatch(post) {
+  const { title, content, image } = post;
+  const textToCheck = `${title} ${content}`.toLowerCase();
+
+  // 이미지 URL에서 ID 추출
+  const imageId = image.split('/').pop().split('?')[0];
+
+  // 키워드 매핑에서 해당 이미지가 어떤 키워드에 매칭되는지 확인
+  let expectedKeywords = [];
+  for (const [key, url] of Object.entries(KEYWORD_IMAGE_MAP)) {
+    if (url.includes(imageId)) {
+      expectedKeywords.push(key.toLowerCase());
+    }
+  }
+
+  // 매핑된 키워드가 콘텐츠에 포함되어 있는지 검증
+  if (expectedKeywords.length > 0) {
+    const hasMatch = expectedKeywords.some(keyword => textToCheck.includes(keyword));
+    if (!hasMatch) {
+      console.warn(`⚠️ Image-content mismatch detected for post: ${title}`);
+      console.warn(`   Expected keywords: ${expectedKeywords.join(', ')}`);
+      return false;
+    }
+  }
+
+  console.log(`✓ Image-content validation passed for: ${title}`);
+  return true;
 }
 
 // 실행
