@@ -398,7 +398,25 @@ const KEYWORD_IMAGE_MAP = {
   '스마트폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
   'iPhone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
   '아이폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+  '애플': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+  'Apple': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
   '로봇': 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
+
+  // 자동차
+  '기아': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  '현대': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  'EV5': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  'EV6': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  'EV9': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+  '자동차': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+
+  // 셀러브리티/패션 인물
+  '칸예': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+  '웨스트': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+  '이지': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+  'Yeezy': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+  '노스': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
+  '카다시안': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
 
   // 음식/식품
   '음식': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
