@@ -205,6 +205,18 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
   if (jsonMatch) {
     try {
       const article = JSON.parse(jsonMatch[0]);
+
+      // 깨진 글씨(Unicode replacement character) 제거/수정
+      article.title = cleanBrokenCharacters(article.title);
+      article.title_en = cleanBrokenCharacters(article.title_en);
+      article.summary = cleanBrokenCharacters(article.summary);
+      article.summary_en = cleanBrokenCharacters(article.summary_en);
+      article.content = cleanBrokenCharacters(article.content);
+      article.content_en = cleanBrokenCharacters(article.content_en);
+      if (article.sources) {
+        article.sources = article.sources.map(s => cleanBrokenCharacters(s));
+      }
+
       // AI 협업 안내문구 추가
       article.content += CONFIG.AI_DISCLAIMER;
       article.content_en += '\n\n---\n* This article was created in collaboration with an AI assistant and finalized through editorial review.';
@@ -216,6 +228,26 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
   }
 
   throw new Error('No valid JSON in response');
+}
+
+// 깨진 글씨(Unicode replacement character) 제거 함수
+function cleanBrokenCharacters(text) {
+  if (!text || typeof text !== 'string') return text;
+
+  // 1. Unicode replacement character (U+FFFD) 제거
+  let cleaned = text.replace(/\uFFFD/g, '');
+
+  // 2. 잘못된 서로게이트 페어(surrogate pairs) 제거
+  cleaned = cleaned.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/g, '');
+  cleaned = cleaned.replace(/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+
+  // 3. NULL 문자 및 기타 제어 문자 제거 (줄바꿈, 탭 제외)
+  cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+
+  // 4. 연속된 공백을 하나로 정리 (단, 줄바꿈은 유지)
+  cleaned = cleaned.replace(/[^\S\n]+/g, ' ');
+
+  return cleaned.trim();
 }
 
 // Claude API 호출
@@ -348,8 +380,13 @@ async function main() {
     // 7. 새 게시글을 맨 앞에 추가 (최신 글이 위로)
     posts = [...newPosts, ...posts];
 
-    // 8. posts.json 저장
-    fs.writeFileSync(CONFIG.POSTS_FILE, JSON.stringify(posts, null, 4), 'utf8');
+    // 8. posts.json 저장 (UTF-8 인코딩 명시)
+    const jsonContent = JSON.stringify(posts, null, 4);
+    // 저장 전 깨진 글씨 최종 검증
+    if (jsonContent.includes('\uFFFD')) {
+      console.warn('⚠️ Warning: Broken characters detected before save. Cleaning...');
+    }
+    fs.writeFileSync(CONFIG.POSTS_FILE, jsonContent, { encoding: 'utf8' });
 
     console.log('\n=== All Posts Generated Successfully ===');
     console.log(`Total new posts: ${newPosts.length}`);
