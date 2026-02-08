@@ -4,6 +4,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 const https = require('https');
 const { parseString } = require('xml2js');
 
@@ -151,21 +152,28 @@ async function generateArticle(keyword, category) {
   const currentMonth = today.getMonth() + 1;
   const currentDate = today.getDate();
 
-  const prompt = `당신은 프리미엄 라이프스타일 매거진 "dod.mag"의 에디터입니다.
-Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
+  const prompt = `당신은 프리미엄 라이프스타일 매거진 "dod.mag"의 수석 에디터입니다.
+Vogue, Elle, GQ 같은 세련된 매거진 스타일로 깊이 있는 정보성 기사를 작성합니다.
 
 **[필수] 오늘 날짜: ${currentYear}년 ${currentMonth}월 ${currentDate}일**
 
 주제: "${keyword}"
 카테고리: ${category}
 
-글쓰기 규칙:
-1. 톤앤매너: 세련되고 깊이 있는 문체, 친근하지만 전문적
+**[핵심] 글 분량 및 구조 규칙:**
+- 한국어 본문: 반드시 5,000자 이상 (공백 포함)
+- 영어 본문: 한국어와 동등한 분량의 완전한 번역본 (요약이 아닌 풀 콘텐츠)
+- 잡지 기사 형식: 인트로 → 배경/맥락 → 핵심 분석 (3~4개 소주제) → 실용적 조언 → 전망/클로징
+- 각 소주제는 **굵은체 소제목**으로 구분
+- 구체적인 데이터, 사례, 전문가 견해를 풍부하게 포함
+- 독자가 실생활에 적용할 수 있는 실용적 정보 포함
+
+글쓰기 톤앤매너:
+1. 세련되고 깊이 있는 문체, 친근하지만 전문적
 2. 독자를 "당신"으로 호칭 (친밀하지만 격식 있게)
 3. 명령형보다 제안형 사용 ("~해보세요" vs "~하세요")
 4. 과장된 표현 지양, 담백하고 세련된 문체
-5. 구체적인 데이터나 사례 인용
-6. 반드시 참고자료(출처) 포함
+5. 단락 간 자연스러운 흐름과 논리적 연결
 
 **[필수] 날짜 검증 규칙:**
 - 제목과 본문에 연도를 언급할 때 반드시 ${currentYear}년 기준으로 작성
@@ -190,12 +198,12 @@ Vogue, Elle 같은 세련된 매거진 스타일로 글을 작성합니다.
 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
   "title": "제목 (25-35자, 클릭 유도하되 낚시성 지양, ${currentYear}년 기준)",
-  "title_en": "English title",
+  "title_en": "English title (equivalent translation)",
   "summary": "요약 (100자 내외, 핵심 메시지 함축)",
-  "summary_en": "English summary",
-  "content": "본문 (2000-2500자, 인트로-현상-분석-실천방안-클로징 구조, 마지막에 참고자료 섹션 포함, 모든 연도는 ${currentYear}년 기준)",
-  "content_en": "English content (shortened version)",
-  "sources": ["출처1 (URL 포함 권장)", "출처2"]
+  "summary_en": "English summary (equivalent translation)",
+  "content": "한국어 본문 (5,000자 이상, 잡지 기사 형식, **굵은체 소제목** 사용, 마지막에 참고자료 섹션 포함, 모든 연도는 ${currentYear}년 기준)",
+  "content_en": "English full article (complete translation of Korean content, NOT a summary. Must be equivalent length and depth as Korean version, with **bold subheadings**)",
+  "sources": ["출처1 (URL 포함 권장)", "출처2", "출처3"]
 }`;
 
   const response = await callClaudeAPI(prompt);
@@ -261,8 +269,8 @@ async function callClaudeAPI(prompt) {
   };
 
   const body = {
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
+    model: 'claude-sonnet-4-5-20250929',
+    max_tokens: 16384,
     messages: [{
       role: 'user',
       content: prompt
@@ -387,6 +395,9 @@ async function main() {
       console.warn('⚠️ Warning: Broken characters detected before save. Cleaning...');
     }
     fs.writeFileSync(CONFIG.POSTS_FILE, jsonContent, { encoding: 'utf8' });
+
+    // 9. sitemap.xml 자동 업데이트
+    generateSitemap(posts);
 
     console.log('\n=== All Posts Generated Successfully ===');
     console.log(`Total new posts: ${newPosts.length}`);
@@ -620,6 +631,48 @@ function validateImageContentMatch(post) {
 
   console.log(`✓ Image-content validation passed for: ${title}`);
   return true;
+}
+
+// sitemap.xml 자동 생성 함수
+function generateSitemap(posts) {
+  const baseUrl = 'https://dodmag.com';
+  const categories = ['인사이트', '신상품', '라이프', '브랜드'];
+
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+  // 메인 페이지
+  xml += '  <url>\n';
+  xml += `    <loc>${baseUrl}/</loc>\n`;
+  xml += '    <changefreq>daily</changefreq>\n';
+  xml += '    <priority>1.0</priority>\n';
+  xml += '  </url>\n';
+
+  // 카테고리 페이지
+  categories.forEach(cat => {
+    xml += '  <url>\n';
+    xml += `    <loc>${baseUrl}/#/category/${encodeURIComponent(cat)}</loc>\n`;
+    xml += '    <changefreq>daily</changefreq>\n';
+    xml += '    <priority>0.8</priority>\n';
+    xml += '  </url>\n';
+  });
+
+  // 각 게시글
+  posts.forEach(post => {
+    const lastmod = post.date.replace(/\./g, '-');
+    xml += '  <url>\n';
+    xml += `    <loc>${baseUrl}/#/post/${post.id}</loc>\n`;
+    xml += `    <lastmod>${lastmod}</lastmod>\n`;
+    xml += '    <changefreq>monthly</changefreq>\n';
+    xml += '    <priority>0.6</priority>\n';
+    xml += '  </url>\n';
+  });
+
+  xml += '</urlset>\n';
+
+  const sitemapPath = path.join(__dirname, '..', 'sitemap.xml');
+  fs.writeFileSync(sitemapPath, xml, { encoding: 'utf8' });
+  console.log(`✓ sitemap.xml updated with ${posts.length} posts`);
 }
 
 // 실행

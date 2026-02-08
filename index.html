@@ -25,6 +25,32 @@
     <meta name="twitter:description" content="20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.">
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=630&fit=crop">
 
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dodmag.com/">
+
+    <!-- JSON-LD 구조화 데이터 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "dod.mag",
+        "alternateName": "일상의 발견",
+        "url": "https://dodmag.com",
+        "description": "20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "dod.mag",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop"
+            }
+        },
+        "inLanguage": ["ko", "en"]
+    }
+    </script>
+    <!-- 게시글별 Article JSON-LD (JavaScript 동적 생성) -->
+    <script type="application/ld+json" id="articleJsonLd"></script>
+
     <!-- Google AdSense -->
     <meta name="google-adsense-account" content="ca-pub-7980804162915934">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7980804162915934" crossorigin="anonymous"></script>
@@ -988,13 +1014,42 @@
             .modal-title {
                 font-size: 36px;
             }
+            .header-inner {
+                padding: 0 16px;
+            }
+            .logo {
+                font-size: 24px;
+            }
             nav {
-                gap: 16px;
-                flex-wrap: wrap;
+                gap: 10px;
+                flex-wrap: nowrap;
+            }
+            nav a {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .lang-selector {
+                gap: 4px;
+                margin-left: 4px;
             }
             .lang-btn {
-                padding: 6px 10px !important;
-                font-size: 11px !important;
+                padding: 4px 8px !important;
+                font-size: 10px !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header-inner {
+                padding: 0 12px;
+            }
+            .logo {
+                font-size: 20px;
+            }
+            nav {
+                gap: 6px;
+            }
+            nav a {
+                font-size: 11px;
             }
         }
 
@@ -1951,7 +2006,7 @@
             });
         }
 
-        function openModal(postId) {
+        function openModal(postId, skipHash) {
             const post = posts.find(p => p.id === postId);
             if (!post) return;
 
@@ -1970,11 +2025,30 @@
 
             document.getElementById('postModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
+
+            // SEO: hash 라우팅 업데이트
+            if (!skipHash) {
+                history.pushState({ type: 'post', id: postId }, '', '#/post/' + postId);
+            }
+            // SEO: 페이지 타이틀 업데이트
+            document.title = getPostText(post, 'title') + ' — dod.mag';
+            // SEO: OG 메타태그 동적 업데이트
+            updateMetaTags(post);
+            // SEO: Article JSON-LD 동적 생성
+            updateArticleJsonLd(post);
         }
 
-        function closeModal() {
+        function closeModal(skipHash) {
             document.getElementById('postModal').style.display = 'none';
             document.body.style.overflow = 'auto';
+
+            // SEO: hash 및 메타태그 복원
+            if (!skipHash) {
+                history.pushState({ type: 'home' }, '', window.location.pathname);
+            }
+            document.title = 'dod.mag — 일상의 발견';
+            resetMetaTags();
+            clearArticleJsonLd();
         }
 
         function editPost(postId) {
@@ -2235,8 +2309,8 @@ dod.mag 드림
             '브랜드': '영감을 주는 브랜드들의 스토리와 철학을 탐구합니다.'
         };
 
-        function openCategoryPage(category) {
-            event.preventDefault();
+        function openCategoryPage(category, skipHash) {
+            if (event) event.preventDefault();
             const categoryPosts = posts.filter(p => p.category === category);
             const t = translations[currentLang];
 
@@ -2272,22 +2346,32 @@ dod.mag 드림
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('categoryPage').classList.add('active');
 
+            // SEO: hash 라우팅 업데이트
+            if (!skipHash) {
+                history.pushState({ type: 'category', category: category }, '', '#/category/' + encodeURIComponent(category));
+            }
+            document.title = translatedCategory + ' — dod.mag';
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function closeCategoryPage() {
-            event.preventDefault();
+        function closeCategoryPage(skipHash) {
+            if (event) event.preventDefault();
             document.querySelector('.hero-banner').style.display = 'block';
             document.querySelector('.container').style.display = 'block';
             if (isAdmin) {
                 document.getElementById('adminSection').style.display = 'block';
             }
             document.getElementById('categoryPage').classList.remove('active');
+            if (!skipHash) {
+                history.pushState({ type: 'home' }, '', window.location.pathname);
+            }
+            document.title = 'dod.mag — 일상의 발견';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function goToHome(event) {
-            event.preventDefault();
+            if (event) event.preventDefault();
             // 모달이 열려있으면 닫기
             document.getElementById('postModal').style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -2303,6 +2387,11 @@ dod.mag 드림
             if (isAdmin) {
                 document.getElementById('adminSection').style.display = 'block';
             }
+            // SEO: hash 및 메타태그 복원
+            history.pushState({ type: 'home' }, '', window.location.pathname);
+            document.title = 'dod.mag — 일상의 발견';
+            resetMetaTags();
+            clearArticleJsonLd();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2622,6 +2711,122 @@ dod.mag 드림
             localStorage.setItem('dodmagLang', lang);
         }
 
+        // ============================================
+        // SEO: 메타태그 동적 업데이트 함수
+        // ============================================
+        const defaultMeta = {
+            title: 'dod.mag — 일상의 발견',
+            description: '20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.',
+            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=630&fit=crop',
+            url: 'https://dodmag.com'
+        };
+
+        function updateMetaTags(post) {
+            const title = getPostText(post, 'title') + ' — dod.mag';
+            const desc = getPostText(post, 'summary');
+            const image = post.image || defaultMeta.image;
+            const url = 'https://dodmag.com/#/post/' + post.id;
+
+            document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
+            document.querySelector('meta[property="og:image"]').setAttribute('content', image);
+            document.querySelector('meta[property="og:url"]').setAttribute('content', url);
+            document.querySelector('meta[property="og:type"]').setAttribute('content', 'article');
+            document.querySelector('meta[name="twitter:title"]').setAttribute('content', title);
+            document.querySelector('meta[name="twitter:description"]').setAttribute('content', desc);
+            document.querySelector('meta[name="twitter:image"]').setAttribute('content', image);
+            document.querySelector('meta[name="description"]').setAttribute('content', desc);
+            document.querySelector('link[rel="canonical"]').setAttribute('href', url);
+        }
+
+        function resetMetaTags() {
+            document.querySelector('meta[property="og:title"]').setAttribute('content', defaultMeta.title);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', defaultMeta.description);
+            document.querySelector('meta[property="og:image"]').setAttribute('content', defaultMeta.image);
+            document.querySelector('meta[property="og:url"]').setAttribute('content', defaultMeta.url);
+            document.querySelector('meta[property="og:type"]').setAttribute('content', 'website');
+            document.querySelector('meta[name="twitter:title"]').setAttribute('content', defaultMeta.title);
+            document.querySelector('meta[name="twitter:description"]').setAttribute('content', defaultMeta.description);
+            document.querySelector('meta[name="twitter:image"]').setAttribute('content', defaultMeta.image);
+            document.querySelector('meta[name="description"]').setAttribute('content', defaultMeta.description);
+            document.querySelector('link[rel="canonical"]').setAttribute('href', defaultMeta.url + '/');
+        }
+
+        function updateArticleJsonLd(post) {
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": getPostText(post, 'title'),
+                "description": getPostText(post, 'summary'),
+                "image": post.image || defaultMeta.image,
+                "datePublished": post.date.replace(/\./g, '-'),
+                "author": { "@type": "Organization", "name": "dod.mag" },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "dod.mag",
+                    "logo": { "@type": "ImageObject", "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop" }
+                },
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "https://dodmag.com/#/post/" + post.id
+                }
+            };
+            document.getElementById('articleJsonLd').textContent = JSON.stringify(jsonLd);
+        }
+
+        function clearArticleJsonLd() {
+            document.getElementById('articleJsonLd').textContent = '';
+        }
+
+        // ============================================
+        // SEO: hash 기반 라우팅
+        // ============================================
+        function handleHashRoute() {
+            const hash = window.location.hash;
+            if (!hash) return;
+
+            // #/post/{id} 패턴
+            const postMatch = hash.match(/^#\/post\/(\d+)$/);
+            if (postMatch) {
+                const postId = parseInt(postMatch[1]);
+                if (posts && posts.length > 0) {
+                    openModal(postId, true);
+                }
+                return;
+            }
+
+            // #/category/{name} 패턴
+            const catMatch = hash.match(/^#\/category\/(.+)$/);
+            if (catMatch) {
+                const category = decodeURIComponent(catMatch[1]);
+                if (posts && posts.length > 0) {
+                    openCategoryPage(category, true);
+                }
+                return;
+            }
+        }
+
+        // 브라우저 뒤로가기/앞으로가기 대응
+        window.addEventListener('popstate', function(e) {
+            const state = e.state;
+            // 먼저 모든 것을 닫기
+            document.getElementById('postModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('categoryPage').classList.remove('active');
+            document.querySelector('.hero-banner').style.display = 'block';
+            document.querySelector('.container').style.display = 'block';
+            document.getElementById('mainFooter').style.display = 'block';
+            if (isAdmin) {
+                document.getElementById('adminSection').style.display = 'block';
+            }
+            document.title = 'dod.mag — 일상의 발견';
+            resetMetaTags();
+            clearArticleJsonLd();
+
+            // hash가 있으면 해당 콘텐츠 표시
+            handleHashRoute();
+        });
+
         // 페이지 로드 시 초기화
         window.addEventListener('load', async function() {
             await loadPosts();
@@ -2634,6 +2839,9 @@ dod.mag 드림
             if (savedLang && savedLang !== 'ko') {
                 setLanguage(savedLang);
             }
+
+            // SEO: 초기 hash 라우팅 처리
+            handleHashRoute();
         });
     </script>
 </body>
