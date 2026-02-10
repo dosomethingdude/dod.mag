@@ -17,14 +17,14 @@ const CONFIG = {
     'https://trends.google.com/trending/rss?geo=US'
   ],
   POSTS_FILE: 'posts.json',
-  CATEGORIES: ['인사이트', '신상품', '라이프', '브랜드'],
+  CATEGORIES: ['인사이트', '경제', '라이프', '브랜드'],
   CATEGORY_EN: {
     '인사이트': 'insights',
-    '신상품': 'products',
+    '경제': 'economy',
     '라이프': 'life',
     '브랜드': 'brands'
   },
-  POSTS_PER_DAY: 3,  // 하루 3개 글 생성
+  POSTS_PER_DAY: 3,  // 하루 3개 글 생성 (경제 카테고리 집중 기간에는 별도 설정)
   AI_DISCLAIMER: '\n\n---\n* 이 포스팅은 AI어시스턴트와 협업하여 제작되었으며, 에디터의 편집을 통해 완성되었습니다.'
 };
 
@@ -112,7 +112,7 @@ async function selectKeywordsForCategories(keywords, categories) {
 
 카테고리별 특성:
 - 인사이트: 라이프 트렌드, 사회 현상 분석, 세대 특성
-- 신상품: 삶의 질 향상 제품, IT 가젯, 뷰티/패션 아이템
+- 경제: 경제 정책, 금리/환율, 투자 트렌드, 부동산, 고용/노동시장, 소비 트렌드
 - 라이프: 웰빙, 건강, 자기관리, 일상 습관
 - 브랜드: 브랜드 스토리, 기업 철학, 지속가능성
 
@@ -152,6 +152,16 @@ async function generateArticle(keyword, category) {
   const currentMonth = today.getMonth() + 1;
   const currentDate = today.getDate();
 
+  // 경제 카테고리 전용 추가 지침
+  const economyExtra = category === '경제' ? `
+**[경제 카테고리 전용 지침]:**
+- 해당 경제 이슈의 **상세한 정책 내용**을 구체적으로 서술
+- 일반 시민이 **참여할 수 있는 방법** (신청 절차, 자격 요건, 신청 기간 등) 상세 기술
+- 관련 **비용** (수수료, 세금, 투자 금액 등)이 있다면 구체적 금액 명시
+- 정부/기관의 공식 웹사이트, 신청 링크 등 **실용적 정보** 포함
+- 독자가 바로 행동할 수 있는 **단계별 가이드** 제공
+` : '';
+
   const prompt = `당신은 프리미엄 라이프스타일 매거진 "dod.mag"의 수석 에디터입니다.
 Vogue, Elle, GQ 같은 세련된 매거진 스타일로 깊이 있는 정보성 기사를 작성합니다.
 
@@ -159,7 +169,7 @@ Vogue, Elle, GQ 같은 세련된 매거진 스타일로 깊이 있는 정보성 
 
 주제: "${keyword}"
 카테고리: ${category}
-
+${economyExtra}
 **[핵심] 글 분량 및 구조 규칙:**
 - 한국어 본문: 반드시 5,000자 이상 (공백 포함)
 - 영어 본문: 한국어와 동등한 분량의 완전한 번역본 (요약이 아닌 풀 콘텐츠)
@@ -203,7 +213,8 @@ Vogue, Elle, GQ 같은 세련된 매거진 스타일로 깊이 있는 정보성 
   "summary_en": "English summary (equivalent translation)",
   "content": "한국어 본문 (5,000자 이상, 잡지 기사 형식, **굵은체 소제목** 사용, 마지막에 참고자료 섹션 포함, 모든 연도는 ${currentYear}년 기준)",
   "content_en": "English full article (complete translation of Korean content, NOT a summary. Must be equivalent length and depth as Korean version, with **bold subheadings**)",
-  "sources": ["출처1 (URL 포함 권장)", "출처2", "출처3"]
+  "sources": ["출처1 (URL 포함 권장)", "출처2", "출처3"],
+  "image_keyword": "이 글의 메인 주제를 가장 잘 표현하는 영어 키워드 1개 (Unsplash 검색용, 예: stock market, real estate, coffee, yoga 등)"
 }`;
 
   const response = await callClaudeAPI(prompt);
@@ -317,7 +328,57 @@ function getCategoriesForToday() {
   return categories;
 }
 
-// 메인 함수 - 하루 3개 글 생성
+// 경제 카테고리 집중 모드 설정
+// 기간: 2026-02-12 ~ 2026-02-14 (3일간)
+// 이 기간 동안 경제 카테고리 8개 글을 추가로 생성
+const ECONOMY_BOOST = {
+  enabled: true,
+  startDate: '2026-02-12',
+  endDate: '2026-02-14',
+  postsPerDay: 8,
+  category: '경제'
+};
+
+// 경제 집중 모드용 키워드 선택
+async function selectEconomyKeywords(keywords, count) {
+  console.log(`Selecting ${count} economy keywords from trends...`);
+
+  const prompt = `당신은 경제 전문 에디터입니다.
+
+아래 트렌드 키워드 목록에서 경제/금융/정책 관련 키워드를 ${count}개 선택하세요.
+경제 관련 키워드가 부족하면, 최근 30일간 한국의 주요 경제 이슈(금리, 환율, 부동산, 고용, 물가, 세금, 투자, 소비, 정부정책 등)를 직접 제안하세요.
+
+트렌드 키워드 목록:
+${keywords.join('\n')}
+
+반드시 아래 형식으로만 ${count}개의 키워드를 응답하세요 (한 줄에 하나):
+1: [키워드]
+2: [키워드]
+3: [키워드]
+...`;
+
+  const response = await callClaudeAPI(prompt);
+  const results = [];
+
+  for (let i = 1; i <= count; i++) {
+    const regex = new RegExp(`${i}:\\s*(.+)`);
+    const match = response.match(regex);
+    if (match) {
+      results.push(match[1].trim());
+    }
+  }
+
+  // 부족한 경우 기본 경제 키워드 추가
+  const defaultEconKeywords = ['금리 인하', '부동산 정책', '물가 안정', '고용 시장', '주식 투자', '환율 변동', '세금 정책', '소비 트렌드'];
+  while (results.length < count) {
+    results.push(defaultEconKeywords[results.length % defaultEconKeywords.length]);
+  }
+
+  console.log('Selected economy keywords:', results);
+  return results;
+}
+
+// 메인 함수 - 하루 3개 글 생성 + 경제 집중 모드
 async function main() {
   console.log('=== dod.mag Auto Post Generator ===');
   console.log(`Date: ${getTodayDate()}`);
@@ -367,7 +428,7 @@ async function main() {
         content: article.content,
         content_en: article.content_en,
         date: getTodayDate(),
-        image: getDefaultImage(category, [...posts, ...newPosts], article.title, keyword),
+        image: getDefaultImage(category, [...posts, ...newPosts], article.title, keyword, article.image_keyword || ''),
         sources: article.sources || [],
         admin_locked: false  // 관리자 수정 우선권 플래그 (false = 자동 업데이트 가능)
       };
@@ -377,6 +438,37 @@ async function main() {
 
       newPosts.push(newPost);
       console.log(`Generated: ${newPost.title}`);
+    }
+
+    // 5-1. 경제 카테고리 집중 모드
+    const today = getTodayDate().replace(/\./g, '-');
+    if (ECONOMY_BOOST.enabled && today >= ECONOMY_BOOST.startDate && today <= ECONOMY_BOOST.endDate) {
+      console.log(`\n=== ECONOMY BOOST MODE (${ECONOMY_BOOST.postsPerDay} articles) ===`);
+      const econKeywords = await selectEconomyKeywords(keywords, ECONOMY_BOOST.postsPerDay);
+
+      for (let i = 0; i < econKeywords.length; i++) {
+        console.log(`\n--- Generating economy article ${i + 1}/${ECONOMY_BOOST.postsPerDay} ---`);
+        const article = await generateArticle(econKeywords[i], ECONOMY_BOOST.category);
+
+        const newPost = {
+          id: getNextId([...posts, ...newPosts]),
+          category: ECONOMY_BOOST.category,
+          title: article.title,
+          title_en: article.title_en,
+          summary: article.summary,
+          summary_en: article.summary_en,
+          content: article.content,
+          content_en: article.content_en,
+          date: getTodayDate(),
+          image: getDefaultImage(ECONOMY_BOOST.category, [...posts, ...newPosts], article.title, econKeywords[i], article.image_keyword || ''),
+          sources: article.sources || [],
+          admin_locked: false
+        };
+
+        validateImageContentMatch(newPost);
+        newPosts.push(newPost);
+        console.log(`Generated economy: ${newPost.title}`);
+      }
     }
 
     // 6. 관리자 잠금된 게시글 보호 (admin_locked: true인 게시글은 덮어쓰지 않음)
@@ -433,12 +525,29 @@ const KEYWORD_IMAGE_MAP = {
   '소비': 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
   '편의점': 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80',
 
-  // 금융/투자
+  // 금융/투자/경제
   '연말정산': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
   '세금': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
   '투자': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
   '엔화': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
   '금융': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+  '경제': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
+  '주식': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+  'stock': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+  '부동산': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
+  'real estate': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
+  '환율': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
+  '금리': 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80',
+  '물가': 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
+  '인플레이션': 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
+  '고용': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
+  '취업': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
+  '창업': 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
+  '스타트업': 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
+  '무역': 'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
+  '수출': 'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
+  '반도체': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
+  '삼성': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
 
   // IT/기술
   'AI': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
@@ -507,17 +616,17 @@ const IMAGE_POOL = {
     'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80',
     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80'
   ],
-  '신상품': [
-    'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200&q=80',
-    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&q=80',
-    'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1200&q=80',
-    'https://images.unsplash.com/photo-1491553895911-0055uj881c60?w=1200&q=80',
-    'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=1200&q=80',
-    'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=1200&q=80',
-    'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=1200&q=80',
-    'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=1200&q=80',
-    'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=1200&q=80'
+  '경제': [
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
+    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
+    'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80',
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1553729459-uj8852516f06?w=1200&q=80',
+    'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
+    'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
+    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80'
   ],
   '라이프': [
     'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
@@ -574,8 +683,19 @@ function getKeywordMatchedImage(title, keyword, existingPosts = []) {
 }
 
 // 중복 방지 이미지 선택 (키워드 매칭 우선)
-function getDefaultImage(category, existingPosts = [], title = '', keyword = '') {
-  // 1. 먼저 키워드 기반 매칭 시도
+function getDefaultImage(category, existingPosts = [], title = '', keyword = '', imageKeyword = '') {
+  // 0. AI가 제안한 image_keyword로 Unsplash 직접 URL 생성 (최우선)
+  if (imageKeyword) {
+    const unsplashSearchUrl = `https://images.unsplash.com/photo-${imageKeyword}?w=1200&q=80`;
+    // image_keyword는 Unsplash 검색용이므로 KEYWORD_IMAGE_MAP에서 먼저 매칭 시도
+    const matchedByAI = getKeywordMatchedImage(title, imageKeyword, existingPosts);
+    if (matchedByAI) {
+      console.log(`AI image_keyword matched: "${imageKeyword}"`);
+      return matchedByAI;
+    }
+  }
+
+  // 1. 트렌드 키워드 기반 매칭 시도
   if (title || keyword) {
     const matchedImage = getKeywordMatchedImage(title, keyword, existingPosts);
     if (matchedImage) {
@@ -636,7 +756,7 @@ function validateImageContentMatch(post) {
 // sitemap.xml 자동 생성 함수
 function generateSitemap(posts) {
   const baseUrl = 'https://dodmag.com';
-  const categories = ['인사이트', '신상품', '라이프', '브랜드'];
+  const categories = ['인사이트', '경제', '라이프', '브랜드'];
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';

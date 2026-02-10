@@ -968,6 +968,125 @@
             transform: rotate(90deg);
         }
 
+        /* 공감 & 공유 사이드바 */
+        .modal-actions {
+            position: fixed;
+            right: calc(50% - 540px);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1001;
+        }
+
+        .modal-action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.95);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .modal-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal-action-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #666;
+            stroke-width: 2;
+        }
+
+        .like-btn.liked svg {
+            fill: #e74c3c;
+            stroke: #e74c3c;
+        }
+
+        .like-btn.liked {
+            background: #fff0f0;
+        }
+
+        .like-count {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: -6px;
+            font-weight: 600;
+        }
+
+        .share-tooltip {
+            display: none;
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border-radius: 28px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            gap: 8px;
+        }
+
+        .share-tooltip.active {
+            display: flex;
+            align-items: center;
+        }
+
+        .share-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            background: transparent;
+        }
+
+        .share-option:hover {
+            transform: scale(1.15);
+        }
+
+        .share-option svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         @media (max-width: 1200px) {
             .posts-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -991,6 +1110,14 @@
             }
             .modal-body {
                 padding: 60px 40px;
+            }
+            .modal-actions {
+                position: fixed;
+                right: 16px;
+                top: auto;
+                bottom: 24px;
+                transform: none;
+                flex-direction: row;
             }
         }
 
@@ -1241,56 +1368,6 @@
             }
         }
 
-        /* 광고 슬롯 스타일 */
-        .ad-slot {
-            background: #f5f5f5;
-            border: 1px dashed #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 14px;
-            overflow: hidden;
-        }
-
-        .ad-slot-banner {
-            width: 100%;
-            height: 120px;
-            margin: 40px 0;
-        }
-
-        .ad-slot-rectangle {
-            width: 300px;
-            height: 250px;
-        }
-
-        .ad-slot-leaderboard {
-            width: 100%;
-            max-width: 728px;
-            height: 90px;
-            margin: 0 auto;
-        }
-
-        .ad-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 60px;
-        }
-
-        @media (max-width: 768px) {
-            .ad-slot-banner {
-                height: 100px;
-                margin: 30px 0;
-            }
-            .ad-slot-leaderboard {
-                height: 60px;
-            }
-            .ad-container {
-                padding: 0 20px;
-            }
-        }
-
         /* 약관 페이지 스타일 */
         .legal-page {
             display: none;
@@ -1437,7 +1514,7 @@
             </div>
             <nav>
                 <a href="#" onclick="openCategoryPage('인사이트')" data-i18n="nav_insights">인사이트</a>
-                <a href="#" onclick="openCategoryPage('신상품')" data-i18n="nav_products">신상품</a>
+                <a href="#" onclick="openCategoryPage('경제')" data-i18n="nav_products">경제</a>
                 <a href="#" onclick="openCategoryPage('라이프')" data-i18n="nav_life">라이프</a>
                 <a href="#" onclick="openCategoryPage('브랜드')" data-i18n="nav_brands">브랜드</a>
                 <div class="lang-selector">
@@ -1507,7 +1584,7 @@
                     <select id="category" required>
                         <option value="">선택하세요</option>
                         <option value="인사이트">인사이트</option>
-                        <option value="신상품">신상품</option>
+                        <option value="경제">경제</option>
                         <option value="라이프">라이프</option>
                         <option value="브랜드">브랜드</option>
                     </select>
@@ -1568,15 +1645,10 @@
             <div class="posts-grid" id="insights-grid"></div>
         </section>
 
-        <!-- 광고 슬롯 1: 인사이트와 신상품 사이 -->
-        <div class="ad-slot ad-slot-banner" id="adSlot1">
-            <span>AD SLOT 1 - Banner (728x90)</span>
-        </div>
-
         <section class="category-section" id="products-section">
             <div class="section-header">
-                <h2 class="section-title" data-i18n="cat_products">신상품</h2>
-                <a href="#" class="view-all" onclick="openCategoryPage('신상품')" data-i18n="view_all">전체보기 →</a>
+                <h2 class="section-title" data-i18n="cat_products">경제</h2>
+                <a href="#" class="view-all" onclick="openCategoryPage('경제')" data-i18n="view_all">전체보기 →</a>
             </div>
             <div class="posts-grid" id="products-grid"></div>
         </section>
@@ -1589,11 +1661,6 @@
             <div class="posts-grid" id="life-grid"></div>
         </section>
 
-        <!-- 광고 슬롯 2: 라이프와 브랜드 사이 -->
-        <div class="ad-slot ad-slot-banner" id="adSlot2">
-            <span>AD SLOT 2 - Banner (728x90)</span>
-        </div>
-
         <section class="category-section" id="brands-section">
             <div class="section-header">
                 <h2 class="section-title" data-i18n="cat_brands">브랜드</h2>
@@ -1601,13 +1668,6 @@
             </div>
             <div class="posts-grid" id="brands-grid"></div>
         </section>
-    </div>
-
-    <!-- 광고 슬롯 3: 콘텐츠 하단 리더보드 -->
-    <div class="ad-container">
-        <div class="ad-slot ad-slot-leaderboard" id="adSlot3">
-            <span>AD SLOT 3 - Leaderboard (728x90)</span>
-        </div>
     </div>
 
     <!-- 카테고리 전체보기 페이지 -->
@@ -1633,7 +1693,29 @@
                 <div class="modal-text" id="modalContent"></div>
             </div>
         </div>
+        <!-- 공감 & 공유 사이드바 -->
+        <div class="modal-actions" id="modalActions" style="display:none;">
+            <button class="modal-action-btn like-btn" id="likeBtn" onclick="toggleLike()" title="공감">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+            <div class="like-count" id="likeCount">0</div>
+            <button class="modal-action-btn share-btn" onclick="toggleShareMenu()" title="공유하기">
+                <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <div class="share-tooltip" id="shareTooltip">
+                    <button class="share-option" onclick="shareTwitter(event)" title="X (Twitter)">
+                        <svg viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </button>
+                    <button class="share-option" onclick="shareFacebook(event)" title="Facebook">
+                        <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </button>
+                    <button class="share-option" onclick="copyLink(event)" title="링크 복사">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </button>
+                </div>
+            </button>
+        </div>
     </div>
+    <div class="copy-toast" id="copyToast">링크가 복사되었습니다</div>
 
     <!-- 개인정보처리방침 페이지 -->
     <div class="legal-page" id="privacyPage">
@@ -1683,10 +1765,11 @@
         let clickTimer = null;
         let currentSlide = 0;
         let carouselInterval = null;
+        let currentModalPostId = null;
 
         const categoryMap = {
             '인사이트': 'insights',
-            '신상품': 'products',
+            '경제': 'products',
             '라이프': 'life',
             '브랜드': 'brands'
         };
@@ -1763,7 +1846,7 @@
                     },
                     {
                         id: 4,
-                        category: '신상품',
+                        category: '경제',
                         title: '올해의 IT 가젯 5선, 당신의 일상을 바꿀 제품들',
                         title_en: 'Top 5 IT Gadgets of the Year That Will Transform Your Daily Life',
                         summary: '실용성과 디자인을 모두 갖춘 2026년 주목할 만한 기술 제품들을 소개합니다. 트렌드를 넘어 실제 삶의 질을 높이는 선택지들입니다.',
@@ -2026,6 +2109,13 @@
             document.getElementById('postModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
 
+            // 공감 & 공유 버튼 표시
+            currentModalPostId = postId;
+            document.getElementById('modalActions').style.display = 'flex';
+            updateLikeUI(postId);
+            // 공유 메뉴 초기화
+            document.getElementById('shareTooltip').classList.remove('active');
+
             // SEO: hash 라우팅 업데이트
             if (!skipHash) {
                 history.pushState({ type: 'post', id: postId }, '', '#/post/' + postId);
@@ -2041,6 +2131,8 @@
         function closeModal(skipHash) {
             document.getElementById('postModal').style.display = 'none';
             document.body.style.overflow = 'auto';
+            document.getElementById('modalActions').style.display = 'none';
+            currentModalPostId = null;
 
             // SEO: hash 및 메타태그 복원
             if (!skipHash) {
@@ -2050,6 +2142,83 @@
             resetMetaTags();
             clearArticleJsonLd();
         }
+
+        // === 공감(하트) 기능 ===
+        function getLikes() {
+            try {
+                return JSON.parse(localStorage.getItem('dodmag_likes') || '{}');
+            } catch { return {}; }
+        }
+
+        function toggleLike() {
+            if (!currentModalPostId) return;
+            const likes = getLikes();
+            const key = String(currentModalPostId);
+            if (likes[key]) {
+                delete likes[key];
+            } else {
+                likes[key] = true;
+            }
+            localStorage.setItem('dodmag_likes', JSON.stringify(likes));
+            updateLikeUI(currentModalPostId);
+        }
+
+        function updateLikeUI(postId) {
+            const likes = getLikes();
+            const btn = document.getElementById('likeBtn');
+            const count = document.getElementById('likeCount');
+            const isLiked = likes[String(postId)] === true;
+            btn.classList.toggle('liked', isLiked);
+            // 전체 공감 수 (localStorage 기반 - 개인 기기 내)
+            const totalLikes = Object.keys(likes).length;
+            count.textContent = isLiked ? '1' : '';
+        }
+
+        // === 공유하기 기능 ===
+        function toggleShareMenu() {
+            const tooltip = document.getElementById('shareTooltip');
+            tooltip.classList.toggle('active');
+        }
+
+        function getShareUrl() {
+            return 'https://dodmag.com/#/post/' + currentModalPostId;
+        }
+
+        function getShareTitle() {
+            return document.getElementById('modalTitle').textContent;
+        }
+
+        function shareTwitter(e) {
+            e.stopPropagation();
+            const url = encodeURIComponent(getShareUrl());
+            const text = encodeURIComponent(getShareTitle() + ' — dod.mag');
+            window.open('https://twitter.com/intent/tweet?url=' + url + '&text=' + text, '_blank', 'width=550,height=420');
+        }
+
+        function shareFacebook(e) {
+            e.stopPropagation();
+            const url = encodeURIComponent(getShareUrl());
+            window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'width=550,height=420');
+        }
+
+        function copyLink(e) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(getShareUrl()).then(() => {
+                const toast = document.getElementById('copyToast');
+                toast.textContent = currentLang === 'en' ? 'Link copied!' : '링크가 복사되었습니다';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+            document.getElementById('shareTooltip').classList.remove('active');
+        }
+
+        // 모달 외부 클릭 시 공유 메뉴 닫기
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.share-btn')) {
+                const tooltip = document.getElementById('shareTooltip');
+                if (tooltip) tooltip.classList.remove('active');
+            }
+        });
 
         function editPost(postId) {
             const post = posts.find(p => p.id === postId);
@@ -2304,7 +2473,7 @@ dod.mag 드림
         // ============================================
         const categoryDescriptions = {
             '인사이트': '라이프 트렌드, 사회 현상, 가치관에 대한 깊이 있는 분석을 만나보세요.',
-            '신상품': '삶의 질을 높이는 제품들을 소개합니다. 트렌드를 넘어 실용적인 선택을 도와드립니다.',
+            '경제': '경제 트렌드, 정책 변화, 투자 인사이트를 분석합니다. 당신의 현명한 경제 생활을 돕습니다.',
             '라이프': '일상 속 웰빙, 건강, 자기관리에 대한 유용한 정보를 전해드립니다.',
             '브랜드': '영감을 주는 브랜드들의 스토리와 철학을 탐구합니다.'
         };
@@ -2549,13 +2718,13 @@ dod.mag 드림
         const translations = {
             ko: {
                 nav_insights: '인사이트',
-                nav_products: '신상품',
+                nav_products: '경제',
                 nav_life: '라이프',
                 nav_brands: '브랜드',
                 nav_subscribe: '구독',
                 nav_logout: '로그아웃',
                 cat_insights: '인사이트',
-                cat_products: '신상품',
+                cat_products: '경제',
                 cat_life: '라이프',
                 cat_brands: '브랜드',
                 view_all: '전체보기 →',
@@ -2575,7 +2744,7 @@ dod.mag 드림
                 login_placeholder: '비밀번호를 입력하세요',
                 btn_login: '로그인',
                 cat_desc_insights: '라이프 트렌드, 사회 현상, 가치관에 대한 깊이 있는 분석을 만나보세요.',
-                cat_desc_products: '삶의 질을 높이는 제품들을 소개합니다. 트렌드를 넘어 실용적인 선택을 도와드립니다.',
+                cat_desc_products: '경제 트렌드, 정책 변화, 투자 인사이트를 분석합니다. 당신의 현명한 경제 생활을 돕습니다.',
                 cat_desc_life: '일상 속 웰빙, 건강, 자기관리에 대한 유용한 정보를 전해드립니다.',
                 cat_desc_brands: '영감을 주는 브랜드들의 스토리와 철학을 탐구합니다.',
                 footer_privacy: '개인정보처리방침',
@@ -2585,13 +2754,13 @@ dod.mag 드림
             },
             en: {
                 nav_insights: 'Insights',
-                nav_products: 'Products',
+                nav_products: 'Economy',
                 nav_life: 'Lifestyle',
                 nav_brands: 'Brands',
                 nav_subscribe: 'Subscribe',
                 nav_logout: 'Logout',
                 cat_insights: 'Insights',
-                cat_products: 'Products',
+                cat_products: 'Economy',
                 cat_life: 'Lifestyle',
                 cat_brands: 'Brands',
                 view_all: 'View All →',
@@ -2611,7 +2780,7 @@ dod.mag 드림
                 login_placeholder: 'Enter password',
                 btn_login: 'Login',
                 cat_desc_insights: 'Deep analysis of life trends, social phenomena, and values.',
-                cat_desc_products: 'Introducing products that enhance your quality of life.',
+                cat_desc_products: 'Analyzing economic trends, policy changes, and investment insights for smarter financial decisions.',
                 cat_desc_life: 'Useful information about everyday wellness, health, and self-care.',
                 cat_desc_brands: 'Exploring the stories and philosophies of inspiring brands.',
                 footer_privacy: 'Privacy Policy',
@@ -2622,8 +2791,8 @@ dod.mag 드림
         };
 
         const categoryTranslations = {
-            ko: { '인사이트': '인사이트', '신상품': '신상품', '라이프': '라이프', '브랜드': '브랜드' },
-            en: { '인사이트': 'Insights', '신상품': 'Products', '라이프': 'Lifestyle', '브랜드': 'Brands' }
+            ko: { '인사이트': '인사이트', '경제': '경제', '라이프': '라이프', '브랜드': '브랜드' },
+            en: { '인사이트': 'Insights', '경제': 'Economy', '라이프': 'Lifestyle', '브랜드': 'Brands' }
         };
 
         function setLanguage(lang) {
@@ -2677,7 +2846,7 @@ dod.mag 드림
 
             // 카테고리 설명 업데이트
             categoryDescriptions['인사이트'] = t.cat_desc_insights;
-            categoryDescriptions['신상품'] = t.cat_desc_products;
+            categoryDescriptions['경제'] = t.cat_desc_products;
             categoryDescriptions['라이프'] = t.cat_desc_life;
             categoryDescriptions['브랜드'] = t.cat_desc_brands;
 
