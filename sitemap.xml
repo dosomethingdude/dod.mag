@@ -6,24 +6,42 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://dodmag.com/#/category/인사이트</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://dodmag.com/#/category/%EC%9D%B8%EC%82%AC%EC%9D%B4%ED%8A%B8</loc>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://dodmag.com/#/category/경제</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://dodmag.com/#/category/%EA%B2%BD%EC%A0%9C</loc>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://dodmag.com/#/category/라이프</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://dodmag.com/#/category/%EB%9D%BC%EC%9D%B4%ED%94%84</loc>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://dodmag.com/#/category/브랜드</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://dodmag.com/#/category/%EB%B8%8C%EB%9E%9C%EB%93%9C</loc>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dodmag.com/#/post/76</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://dodmag.com/#/post/77</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://dodmag.com/#/post/78</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://dodmag.com/#/post/73</loc>
