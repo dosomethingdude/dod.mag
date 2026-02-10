@@ -968,7 +968,7 @@
             transform: rotate(90deg);
         }
 
-        /* 공감 & 공유 사이드바 */
+        /* 공감 & 공유 플로팅 바 */
         .modal-actions {
             position: fixed;
             right: calc(50% - 540px);
@@ -976,13 +976,18 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            gap: 8px;
             z-index: 1001;
         }
 
         .modal-action-btn {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            max-width: 44px;
+            max-height: 44px;
             border-radius: 50%;
             border: none;
             background: rgba(255,255,255,0.95);
@@ -992,25 +997,17 @@
             justify-content: center;
             box-shadow: 0 2px 12px rgba(0,0,0,0.15);
             transition: all 0.3s;
-            position: relative;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
         }
 
         .modal-action-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-
-        .modal-action-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: #666;
-            stroke-width: 2;
-        }
-
-        .like-btn.liked svg {
-            fill: #e74c3c;
-            stroke: #e74c3c;
         }
 
         .like-btn.liked {
@@ -1021,32 +1018,32 @@
             font-size: 11px;
             color: #999;
             text-align: center;
-            margin-top: -6px;
             font-weight: 600;
+            line-height: 1;
         }
 
-        .share-tooltip {
+        .share-menu {
             display: none;
-            position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #fff;
-            border-radius: 28px;
-            padding: 8px 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            white-space: nowrap;
+            position: fixed;
+            z-index: 1002;
+            flex-direction: column;
+            align-items: center;
             gap: 8px;
+            background: #fff;
+            border-radius: 24px;
+            padding: 12px 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
         }
 
-        .share-tooltip.active {
+        .share-menu.active {
             display: flex;
-            align-items: center;
         }
 
         .share-option {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -1054,16 +1051,15 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
-            background: transparent;
+            background: #f5f5f5;
+            padding: 0;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .share-option:hover {
-            transform: scale(1.15);
-        }
-
-        .share-option svg {
-            width: 20px;
-            height: 20px;
+            transform: scale(1.12);
+            background: #eee;
         }
 
         .copy-toast {
@@ -1112,12 +1108,9 @@
                 padding: 60px 40px;
             }
             .modal-actions {
-                position: fixed;
-                right: 16px;
-                top: auto;
-                bottom: 24px;
-                transform: none;
-                flex-direction: row;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
             }
         }
 
@@ -1693,27 +1686,29 @@
                 <div class="modal-text" id="modalContent"></div>
             </div>
         </div>
-        <!-- 공감 & 공유 사이드바 -->
+        <!-- 공감 & 공유 플로팅 바 -->
         <div class="modal-actions" id="modalActions" style="display:none;">
             <button class="modal-action-btn like-btn" id="likeBtn" onclick="toggleLike()" title="공감">
-                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
-            <div class="like-count" id="likeCount">0</div>
-            <button class="modal-action-btn share-btn" onclick="toggleShareMenu()" title="공유하기">
-                <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                <div class="share-tooltip" id="shareTooltip">
-                    <button class="share-option" onclick="shareTwitter(event)" title="X (Twitter)">
-                        <svg viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    </button>
-                    <button class="share-option" onclick="shareFacebook(event)" title="Facebook">
-                        <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    </button>
-                    <button class="share-option" onclick="copyLink(event)" title="링크 복사">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    </button>
-                </div>
+            <div class="like-count" id="likeCount"></div>
+            <button class="modal-action-btn share-btn" id="shareBtn" onclick="toggleShareMenu()" title="공유하기">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
         </div>
+    </div>
+
+    <!-- 공유 메뉴 (모달 바깥) -->
+    <div class="share-menu" id="shareMenu">
+        <button class="share-option" onclick="shareTwitter(event)" title="X (Twitter)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </button>
+        <button class="share-option" onclick="shareFacebook(event)" title="Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </button>
+        <button class="share-option" onclick="copyLink(event)" title="링크 복사">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
     </div>
     <div class="copy-toast" id="copyToast">링크가 복사되었습니다</div>
 
@@ -2114,7 +2109,7 @@
             document.getElementById('modalActions').style.display = 'flex';
             updateLikeUI(postId);
             // 공유 메뉴 초기화
-            document.getElementById('shareTooltip').classList.remove('active');
+            document.getElementById('shareMenu').classList.remove('active');
 
             // SEO: hash 라우팅 업데이트
             if (!skipHash) {
@@ -2132,6 +2127,7 @@
             document.getElementById('postModal').style.display = 'none';
             document.body.style.overflow = 'auto';
             document.getElementById('modalActions').style.display = 'none';
+            document.getElementById('shareMenu').classList.remove('active');
             currentModalPostId = null;
 
             // SEO: hash 및 메타태그 복원
@@ -2147,7 +2143,7 @@
         function getLikes() {
             try {
                 return JSON.parse(localStorage.getItem('dodmag_likes') || '{}');
-            } catch { return {}; }
+            } catch (e) { return {}; }
         }
 
         function toggleLike() {
@@ -2166,18 +2162,34 @@
         function updateLikeUI(postId) {
             const likes = getLikes();
             const btn = document.getElementById('likeBtn');
-            const count = document.getElementById('likeCount');
+            const countEl = document.getElementById('likeCount');
             const isLiked = likes[String(postId)] === true;
-            btn.classList.toggle('liked', isLiked);
-            // 전체 공감 수 (localStorage 기반 - 개인 기기 내)
-            const totalLikes = Object.keys(likes).length;
-            count.textContent = isLiked ? '1' : '';
+            if (isLiked) {
+                btn.classList.add('liked');
+                btn.querySelector('svg').setAttribute('fill', '#e74c3c');
+                btn.querySelector('svg').setAttribute('stroke', '#e74c3c');
+                countEl.textContent = '1';
+            } else {
+                btn.classList.remove('liked');
+                btn.querySelector('svg').setAttribute('fill', 'none');
+                btn.querySelector('svg').setAttribute('stroke', '#888');
+                countEl.textContent = '';
+            }
         }
 
         // === 공유하기 기능 ===
         function toggleShareMenu() {
-            const tooltip = document.getElementById('shareTooltip');
-            tooltip.classList.toggle('active');
+            const menu = document.getElementById('shareMenu');
+            const shareBtn = document.getElementById('shareBtn');
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                return;
+            }
+            // 공유 버튼 위치 기준으로 메뉴 배치
+            const rect = shareBtn.getBoundingClientRect();
+            menu.style.right = (window.innerWidth - rect.left + 12) + 'px';
+            menu.style.top = (rect.top - 20) + 'px';
+            menu.classList.add('active');
         }
 
         function getShareUrl() {
@@ -2193,30 +2205,32 @@
             const url = encodeURIComponent(getShareUrl());
             const text = encodeURIComponent(getShareTitle() + ' — dod.mag');
             window.open('https://twitter.com/intent/tweet?url=' + url + '&text=' + text, '_blank', 'width=550,height=420');
+            document.getElementById('shareMenu').classList.remove('active');
         }
 
         function shareFacebook(e) {
             e.stopPropagation();
             const url = encodeURIComponent(getShareUrl());
             window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'width=550,height=420');
+            document.getElementById('shareMenu').classList.remove('active');
         }
 
         function copyLink(e) {
             e.stopPropagation();
-            navigator.clipboard.writeText(getShareUrl()).then(() => {
-                const toast = document.getElementById('copyToast');
+            navigator.clipboard.writeText(getShareUrl()).then(function() {
+                var toast = document.getElementById('copyToast');
                 toast.textContent = currentLang === 'en' ? 'Link copied!' : '링크가 복사되었습니다';
                 toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2000);
+                setTimeout(function() { toast.classList.remove('show'); }, 2000);
             });
-            document.getElementById('shareTooltip').classList.remove('active');
+            document.getElementById('shareMenu').classList.remove('active');
         }
 
-        // 모달 외부 클릭 시 공유 메뉴 닫기
+        // 외부 클릭 시 공유 메뉴 닫기
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.share-btn')) {
-                const tooltip = document.getElementById('shareTooltip');
-                if (tooltip) tooltip.classList.remove('active');
+            if (!e.target.closest('.share-btn') && !e.target.closest('.share-menu')) {
+                var menu = document.getElementById('shareMenu');
+                if (menu) menu.classList.remove('active');
             }
         });
 
