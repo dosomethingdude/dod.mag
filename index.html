@@ -15,7 +15,7 @@
     <meta property="og:title" content="dod.mag — 일상의 발견">
     <meta property="og:description" content="20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=630&fit=crop">
-    <meta property="og:url" content="https://dodmag.com">
+    <meta property="og:url" content="https://dod-mag.pages.dev">
     <meta property="og:site_name" content="dod.mag">
     <meta property="og:locale" content="ko_KR">
 
@@ -26,7 +26,7 @@
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=630&fit=crop">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://dodmag.com/">
+    <link rel="canonical" href="https://dod-mag.pages.dev/">
 
     <!-- JSON-LD 구조화 데이터 -->
     <script type="application/ld+json">
@@ -35,7 +35,7 @@
         "@type": "WebSite",
         "name": "dod.mag",
         "alternateName": "일상의 발견",
-        "url": "https://dodmag.com",
+        "url": "https://dod-mag.pages.dev",
         "description": "20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.",
         "publisher": {
             "@type": "Organization",
@@ -2193,7 +2193,7 @@
         }
 
         function getShareUrl() {
-            return 'https://dodmag.com/#/post/' + currentModalPostId;
+            return 'https://dod-mag.pages.dev/#/post/' + currentModalPostId;
         }
 
         function getShareTitle() {
@@ -2604,7 +2604,7 @@ dod.mag 드림
 
 <h2>5. 개인정보 보호책임자</h2>
 <p>회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
-<p>이메일: privacy@dodmag.com</p>
+<p>이메일: privacy@dod-mag.pages.dev</p>
 
 <h2>6. 개인정보의 안전성 확보조치</h2>
 <p>회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다:</p>
@@ -2901,14 +2901,14 @@ dod.mag 드림
             title: 'dod.mag — 일상의 발견',
             description: '20-30대 여성을 위한 라이프스타일 매거진. 트렌드, 뷰티, 라이프, 브랜드 인사이트를 전합니다.',
             image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=630&fit=crop',
-            url: 'https://dodmag.com'
+            url: 'https://dod-mag.pages.dev'
         };
 
         function updateMetaTags(post) {
             const title = getPostText(post, 'title') + ' — dod.mag';
             const desc = getPostText(post, 'summary');
             const image = post.image || defaultMeta.image;
-            const url = 'https://dodmag.com/#/post/' + post.id;
+            const url = 'https://dod-mag.pages.dev/#/post/' + post.id;
 
             document.querySelector('meta[property="og:title"]').setAttribute('content', title);
             document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
@@ -2951,7 +2951,7 @@ dod.mag 드림
                 },
                 "mainEntityOfPage": {
                     "@type": "WebPage",
-                    "@id": "https://dodmag.com/#/post/" + post.id
+                    "@id": "https://dod-mag.pages.dev/#/post/" + post.id
                 }
             };
             document.getElementById('articleJsonLd').textContent = JSON.stringify(jsonLd);

@@ -222,7 +222,7 @@ https://search.google.com/search-console 에 접속
 ```
 좌측 상단 "속성 추가" 클릭
 → "URL 접두어" 선택
-→ https://dodmag.com 입력
+→ https://dod-mag.pages.dev 입력
 → "계속" 클릭
 ```
 
@@ -244,7 +244,7 @@ https://search.google.com/search-console 에 접속
 **5단계: 색인 요청 (선택)**
 ```
 상단 검색창에 개별 게시글 URL 입력
-예: https://dodmag.com/#/post/70
+예: https://dod-mag.pages.dev/#/post/70
 → "색인 생성 요청" 클릭
 ```
 

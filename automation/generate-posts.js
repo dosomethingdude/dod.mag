@@ -755,7 +755,7 @@ function validateImageContentMatch(post) {
 
 // sitemap.xml 자동 생성 함수
 function generateSitemap(posts) {
-  const baseUrl = 'https://dodmag.com';
+  const baseUrl = 'https://dod-mag.pages.dev';
   const categories = ['인사이트', '경제', '라이프', '브랜드'];
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
