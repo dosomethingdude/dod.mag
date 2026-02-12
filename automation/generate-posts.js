@@ -217,21 +217,52 @@ ${economyExtra}
   "image_keyword": "이 글의 메인 주제를 가장 잘 표현하는 영어 키워드 1개 (Unsplash 검색용, 예: stock market, real estate, coffee, yoga 등)"
 }`;
 
-  const response = await callClaudeAPI(prompt);
-
-  // JSON 추출
-  const jsonMatch = response.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
+  // 최대 2회 재시도
+  for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const article = JSON.parse(jsonMatch[0]);
+      const response = await callClaudeAPI(prompt);
+
+      // JSON 추출
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.warn(`Attempt ${attempt}: No valid JSON in response`);
+        if (attempt < 2) { console.log('Retrying...'); continue; }
+        throw new Error('No valid JSON in response after retries');
+      }
+
+      let jsonStr = jsonMatch[0];
+
+      // JSON 복구: 잘린 문자열 수정 시도
+      try {
+        JSON.parse(jsonStr);
+      } catch (parseErr) {
+        console.warn(`Attempt ${attempt}: JSON parse error: ${parseErr.message}`);
+        // 잘린 JSON 복구 시도: 미닫힌 따옴표/중괄호 수정
+        jsonStr = jsonStr.replace(/,\s*$/, '');  // 끝 쉼표 제거
+        if (!jsonStr.endsWith('}')) {
+          // content 필드에서 잘린 경우 - 마지막 완전한 필드까지 자르기
+          const lastQuoteComma = jsonStr.lastIndexOf('",');
+          if (lastQuoteComma > 0) {
+            jsonStr = jsonStr.substring(0, lastQuoteComma + 1) + '}';
+          }
+        }
+        // 미닫힌 문자열 닫기
+        const openQuotes = (jsonStr.match(/"/g) || []).length;
+        if (openQuotes % 2 !== 0) {
+          jsonStr += '"';
+        }
+        if (!jsonStr.endsWith('}')) jsonStr += '}';
+      }
+
+      const article = JSON.parse(jsonStr);
 
       // 깨진 글씨(Unicode replacement character) 제거/수정
-      article.title = cleanBrokenCharacters(article.title);
-      article.title_en = cleanBrokenCharacters(article.title_en);
-      article.summary = cleanBrokenCharacters(article.summary);
-      article.summary_en = cleanBrokenCharacters(article.summary_en);
-      article.content = cleanBrokenCharacters(article.content);
-      article.content_en = cleanBrokenCharacters(article.content_en);
+      article.title = cleanBrokenCharacters(article.title || '');
+      article.title_en = cleanBrokenCharacters(article.title_en || '');
+      article.summary = cleanBrokenCharacters(article.summary || '');
+      article.summary_en = cleanBrokenCharacters(article.summary_en || '');
+      article.content = cleanBrokenCharacters(article.content || '');
+      article.content_en = cleanBrokenCharacters(article.content_en || '');
       if (article.sources) {
         article.sources = article.sources.map(s => cleanBrokenCharacters(s));
       }
@@ -241,12 +272,11 @@ ${economyExtra}
       article.content_en += '\n\n---\n* This article was created in collaboration with an AI assistant and finalized through editorial review.';
       return article;
     } catch (e) {
-      console.error('Failed to parse article JSON:', e.message);
-      throw new Error('Article generation failed');
+      console.error(`Attempt ${attempt} failed:`, e.message);
+      if (attempt >= 2) throw new Error('Article generation failed after retries');
+      console.log('Retrying article generation...');
     }
   }
-
-  throw new Error('No valid JSON in response');
 }
 
 // 깨진 글씨(Unicode replacement character) 제거 함수
@@ -414,30 +444,33 @@ async function main() {
     // 5. 각 키워드에 대해 글 생성
     const newPosts = [];
     for (const { category, keyword } of keywordSelections) {
-      console.log(`\n--- Generating article ${newPosts.length + 1}/${CONFIG.POSTS_PER_DAY} ---`);
+      try {
+        console.log(`\n--- Generating article ${newPosts.length + 1}/${CONFIG.POSTS_PER_DAY} ---`);
 
-      const article = await generateArticle(keyword, category);
+        const article = await generateArticle(keyword, category);
 
-      const newPost = {
-        id: getNextId([...posts, ...newPosts]),
-        category: category,
-        title: article.title,
-        title_en: article.title_en,
-        summary: article.summary,
-        summary_en: article.summary_en,
-        content: article.content,
-        content_en: article.content_en,
-        date: getTodayDate(),
-        image: getDefaultImage(category, [...posts, ...newPosts], article.title, keyword, article.image_keyword || ''),
-        sources: article.sources || [],
-        admin_locked: false  // 관리자 수정 우선권 플래그 (false = 자동 업데이트 가능)
-      };
+        const newPost = {
+          id: getNextId([...posts, ...newPosts]),
+          category: category,
+          title: article.title,
+          title_en: article.title_en,
+          summary: article.summary,
+          summary_en: article.summary_en,
+          content: article.content,
+          content_en: article.content_en,
+          date: getTodayDate(),
+          image: getDefaultImage(category, [...posts, ...newPosts], article.title, keyword, article.image_keyword || ''),
+          sources: article.sources || [],
+          admin_locked: false
+        };
 
-      // 이미지-콘텐츠 주제 일치 검증
-      validateImageContentMatch(newPost);
-
-      newPosts.push(newPost);
-      console.log(`Generated: ${newPost.title}`);
+        validateImageContentMatch(newPost);
+        newPosts.push(newPost);
+        console.log(`Generated: ${newPost.title}`);
+      } catch (artErr) {
+        console.error(`⚠️ Article failed (${keyword}): ${artErr.message}`);
+        console.log('Skipping and continuing...');
+      }
     }
 
     // 5-1. 경제 카테고리 집중 모드
@@ -447,27 +480,32 @@ async function main() {
       const econKeywords = await selectEconomyKeywords(keywords, ECONOMY_BOOST.postsPerDay);
 
       for (let i = 0; i < econKeywords.length; i++) {
-        console.log(`\n--- Generating economy article ${i + 1}/${ECONOMY_BOOST.postsPerDay} ---`);
-        const article = await generateArticle(econKeywords[i], ECONOMY_BOOST.category);
+        try {
+          console.log(`\n--- Generating economy article ${i + 1}/${ECONOMY_BOOST.postsPerDay} ---`);
+          const article = await generateArticle(econKeywords[i], ECONOMY_BOOST.category);
 
-        const newPost = {
-          id: getNextId([...posts, ...newPosts]),
-          category: ECONOMY_BOOST.category,
-          title: article.title,
-          title_en: article.title_en,
-          summary: article.summary,
-          summary_en: article.summary_en,
-          content: article.content,
-          content_en: article.content_en,
-          date: getTodayDate(),
-          image: getDefaultImage(ECONOMY_BOOST.category, [...posts, ...newPosts], article.title, econKeywords[i], article.image_keyword || ''),
-          sources: article.sources || [],
-          admin_locked: false
-        };
+          const newPost = {
+            id: getNextId([...posts, ...newPosts]),
+            category: ECONOMY_BOOST.category,
+            title: article.title,
+            title_en: article.title_en,
+            summary: article.summary,
+            summary_en: article.summary_en,
+            content: article.content,
+            content_en: article.content_en,
+            date: getTodayDate(),
+            image: getDefaultImage(ECONOMY_BOOST.category, [...posts, ...newPosts], article.title, econKeywords[i], article.image_keyword || ''),
+            sources: article.sources || [],
+            admin_locked: false
+          };
 
-        validateImageContentMatch(newPost);
-        newPosts.push(newPost);
-        console.log(`Generated economy: ${newPost.title}`);
+          validateImageContentMatch(newPost);
+          newPosts.push(newPost);
+          console.log(`Generated economy: ${newPost.title}`);
+        } catch (econErr) {
+          console.error(`⚠️ Economy article ${i + 1} failed (${econKeywords[i]}): ${econErr.message}`);
+          console.log('Skipping and continuing...');
+        }
       }
     }
 
