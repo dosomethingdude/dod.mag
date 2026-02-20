@@ -312,36 +312,65 @@ function cleanBrokenCharacters(text) {
   return cleaned.trim();
 }
 
-// Gemini API 호출
+// Gemini API 호출 (rate limit 재시도 포함)
 async function callClaudeAPI(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-pro'];
 
-  const headers = {
-    'Content-Type': 'application/json'
-  };
+  for (const model of models) {
+    try {
+      console.log(`Trying Gemini model: ${model}`);
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
-  const body = {
-    contents: [{
-      parts: [{ text: prompt }]
-    }],
-    generationConfig: {
-      maxOutputTokens: 16384,
-      temperature: 0.7
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      const body = {
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 16384,
+          temperature: 0.7
+        }
+      };
+
+      const response = await httpPost(url, body, headers);
+
+      // rate limit → 30초 대기 후 재시도
+      if (response.error && response.error.code === 429) {
+        console.log(`Rate limited on ${model}, waiting 30s...`);
+        await new Promise(r => setTimeout(r, 30000));
+        const retry = await httpPost(url, body, headers);
+        if (retry.error) {
+          console.log(`${model} retry failed: ${retry.error.message}`);
+          continue;
+        }
+        const retryText = retry.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (retryText) return retryText;
+        continue;
+      }
+
+      if (response.error) {
+        console.log(`${model} error: ${response.error.message}`);
+        continue;  // 다음 모델 시도
+      }
+
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        console.log(`${model}: empty response`);
+        continue;
+      }
+
+      console.log(`✓ Success with ${model}`);
+      return text;
+    } catch (e) {
+      console.log(`${model} exception: ${e.message}`);
+      continue;
     }
-  };
-
-  const response = await httpPost(url, body, headers);
-
-  if (response.error) {
-    throw new Error(`Gemini API error: ${response.error.message}`);
   }
 
-  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error('Empty response from Gemini API');
-  }
-
-  return text;
+  throw new Error('All Gemini models failed');
 }
 
 // 오늘 날짜 포맷
