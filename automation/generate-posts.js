@@ -345,14 +345,13 @@ async function listAvailableModels() {
 
 // Gemini API 호출 (rate limit 재시도 + 모델 자동 탐색)
 async function callClaudeAPI(prompt) {
-  // 우선 시도할 모델 목록 (최신순)
+  // 우선 시도할 모델 목록 (작동 확인된 순서)
   const preferredModels = [
+    'gemini-2.5-flash',       // ✓ 작동 확인됨
+    'gemini-2.5-pro',
+    'gemini-2.5-flash-lite',
     'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-pro',
-    'gemini-1.5-pro-latest'
+    'gemini-2.0-flash-lite'
   ];
 
   // 사용 가능한 모델 조회하여 우선순위 정렬
