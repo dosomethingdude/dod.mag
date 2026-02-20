@@ -200,6 +200,13 @@ ${economyExtra}
 - 존재하지 않는 브랜드, 제품, 이벤트를 만들어내지 마세요
 - 실제 기업/인물에 대한 허위 정보를 작성하지 마세요
 
+**[필수] 키워드 인물/주제 정확성 규칙:**
+- 트렌드 키워드가 실존 인물일 경우, 반드시 해당 인물의 실제 직업·이력·국적을 정확히 파악한 후 작성하세요
+- 예: "클로이킴"은 패션디자이너가 아닌 미국 스노보드 금메달리스트입니다
+- 인물의 직업이나 정체가 불확실하면 해당 키워드로 글을 작성하지 말고, JSON에 "skip": true를 포함하세요
+- 키워드가 여러 의미를 가질 수 있는 경우, 현재 트렌드 맥락에서 가장 화제가 되는 의미로 작성하세요
+- 글의 제목에 나오는 핵심 주제어(예: 포르쉐, 반도체, 가상자산 등)가 곧 이 글의 대표 키워드입니다
+
 **[필수] 출처 형식:**
 - 실제 존재하는 공식 기관, 언론사, 기업의 공식 발표만 출처로 사용
 - "~리포트", "~조사" 등 가상의 출처를 만들지 마세요
@@ -214,7 +221,7 @@ ${economyExtra}
   "content": "한국어 본문 (5,000자 이상, 잡지 기사 형식, **굵은체 소제목** 사용, 마지막에 참고자료 섹션 포함, 모든 연도는 ${currentYear}년 기준)",
   "content_en": "English full article (complete translation of Korean content, NOT a summary. Must be equivalent length and depth as Korean version, with **bold subheadings**)",
   "sources": ["출처1 (URL 포함 권장)", "출처2", "출처3"],
-  "image_keyword": "이 글의 메인 주제를 가장 잘 표현하는 영어 키워드 1개 (Unsplash 검색용, 예: stock market, real estate, coffee, yoga 등)"
+  "image_keyword": "제목의 핵심 주제를 정확히 반영하는 영어 키워드 1개. 반드시 제목에 등장하는 메인 주제어의 영문 표현이어야 합니다 (예: 포르쉐→porsche, 반도체→semiconductor, 가상자산→cryptocurrency, 금리→interest rate, 부동산→real estate, 환율→currency exchange, 최저임금→minimum wage, 세제개편→tax reform). 브랜드명은 그대로 영문 표기하세요."
 }`;
 
   // 최대 2회 재시도
@@ -255,6 +262,12 @@ ${economyExtra}
       }
 
       const article = JSON.parse(jsonStr);
+
+      // AI가 skip 판단한 경우 (인물/주제 정확성 불확실)
+      if (article.skip === true) {
+        console.log(`⏭️ AI skipped keyword (insufficient facts): ${keyword}`);
+        return null;
+      }
 
       // 깨진 글씨(Unicode replacement character) 제거/수정
       article.title = cleanBrokenCharacters(article.title || '');
@@ -448,6 +461,7 @@ async function main() {
         console.log(`\n--- Generating article ${newPosts.length + 1}/${CONFIG.POSTS_PER_DAY} ---`);
 
         const article = await generateArticle(keyword, category);
+        if (!article) continue;  // AI가 skip한 경우
 
         const newPost = {
           id: getNextId([...posts, ...newPosts]),
@@ -464,7 +478,6 @@ async function main() {
           admin_locked: false
         };
 
-        validateImageContentMatch(newPost);
         newPosts.push(newPost);
         console.log(`Generated: ${newPost.title}`);
       } catch (artErr) {
@@ -483,6 +496,7 @@ async function main() {
         try {
           console.log(`\n--- Generating economy article ${i + 1}/${ECONOMY_BOOST.postsPerDay} ---`);
           const article = await generateArticle(econKeywords[i], ECONOMY_BOOST.category);
+          if (!article) continue;  // AI가 skip한 경우
 
           const newPost = {
             id: getNextId([...posts, ...newPosts]),
@@ -499,7 +513,6 @@ async function main() {
             admin_locked: false
           };
 
-          validateImageContentMatch(newPost);
           newPosts.push(newPost);
           console.log(`Generated economy: ${newPost.title}`);
         } catch (econErr) {
@@ -541,154 +554,391 @@ async function main() {
   }
 }
 
-// 키워드별 맞춤 이미지 (콘텐츠-이미지 주제 일치 검증용)
-const KEYWORD_IMAGE_MAP = {
-  // 의료/건강 관련
-  '의료': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
-  '병원': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
-  '드라마': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
-  '건강': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
-  '웰빙': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+// ============================================================
+// 토픽 기반 이미지 매칭 시스템 (Unsplash + Pexels)
+// - 각 토픽에 한국어/영어 키워드 + 다수 이미지 URL
+// - AI의 image_keyword(영어)와 제목(한국어) 모두 매칭 가능
+// ============================================================
 
-  // 배터리/전기차/에너지
-  '배터리': 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=1200&q=80',
-  '전기차': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  'EV': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  '충전': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  '에너지': 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=1200&q=80',
+const TOPIC_IMAGES = [
+  // === 자동차/럭셔리카 ===
+  {
+    keywords: ['porsche', '포르쉐', 'luxury car', '럭셔리카', 'ferrari', '페라리', 'bmw', 'mercedes', '벤츠', 'supercar', '슈퍼카', 'sports car', 'lamborghini', '람보르기니', 'maserati'],
+    images: [
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=80',
+      'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200&q=80',
+      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80',
+      'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3136673/pexels-photo-3136673.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 전기차/EV ===
+  {
+    keywords: ['전기차', 'electric vehicle', 'ev', 'tesla', '테슬라', '충전', 'charging', '기아', '현대', 'hyundai', 'kia', 'EV5', 'EV6', 'EV9'],
+    images: [
+      'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
+      'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&q=80',
+      'https://images.pexels.com/photos/110844/pexels-photo-110844.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3846205/pexels-photo-3846205.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 주식/투자/트레이딩 ===
+  {
+    keywords: ['주식', 'stock', 'stock market', 'trading', '투자', 'investment', '증권', 'securities', 'nasdaq', '나스닥', '코스피', 'kospi', 'roku', 'draftkings', 'AMAT'],
+    images: [
+      'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
+      'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=1200&q=80',
+      'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/6801648/pexels-photo-6801648.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/7567443/pexels-photo-7567443.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 금리/은행/통화정책 ===
+  {
+    keywords: ['금리', 'interest rate', 'banking', '은행', '기준금리', 'monetary policy', '통화정책', '한국은행', 'central bank', 'fed', '연준'],
+    images: [
+      'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80',
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
+      'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 환율/외환 ===
+  {
+    keywords: ['환율', 'currency', 'exchange rate', 'currency exchange', '달러', 'dollar', '엔화', 'yen', '위안', 'yuan', '외환', 'forex'],
+    images: [
+      'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
+      'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=1200&q=80',
+      'https://images.pexels.com/photos/3532540/pexels-photo-3532540.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/4386476/pexels-photo-4386476.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 부동산 ===
+  {
+    keywords: ['부동산', 'real estate', 'property', '아파트', 'apartment', '주택', 'housing', '종부세', '분양', '재건축', '모기지', 'mortgage', 'PF'],
+    images: [
+      'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
+      'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1200&q=80',
+      'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/1546168/pexels-photo-1546168.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 가상자산/암호화폐 ===
+  {
+    keywords: ['가상자산', 'cryptocurrency', 'crypto', '비트코인', 'bitcoin', '이더리움', 'ethereum', '블록체인', 'blockchain', '코인', '암호화폐', '빗썸', 'bithumb', '디지털 자산'],
+    images: [
+      'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=1200&q=80',
+      'https://images.unsplash.com/photo-1639762681057-408e52192e55?w=1200&q=80',
+      'https://images.pexels.com/photos/844124/pexels-photo-844124.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/8370752/pexels-photo-8370752.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 세금/세제 ===
+  {
+    keywords: ['세금', 'tax', 'taxation', 'tax reform', '세제', '연말정산', '종합소득세', '세제개편', '과세', '절세', '세무'],
+    images: [
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
+      'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&q=80',
+      'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/6863332/pexels-photo-6863332.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 임금/노동/고용 ===
+  {
+    keywords: ['최저임금', 'minimum wage', 'wage', 'salary', '임금', '고용', 'employment', '취업', 'job', '노동', 'labor', '일자리', '청년고용', '채용'],
+    images: [
+      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
+      'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&q=80',
+      'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/5439381/pexels-photo-5439381.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 물가/인플레이션 ===
+  {
+    keywords: ['물가', 'inflation', 'consumer price', '인플레이션', '소비자물가', 'CPI', '장바구니', 'grocery'],
+    images: [
+      'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
+      'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3962285/pexels-photo-3962285.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 반도체/칩 ===
+  {
+    keywords: ['반도체', 'semiconductor', 'chip', '칩', '삼성전자', 'samsung', 'SK하이닉스', 'hynix', 'AMAT', '웨이퍼', 'wafer', '파운드리', 'foundry'],
+    images: [
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
+      'https://images.unsplash.com/photo-1635241161466-541f065683ba?w=1200&q=80',
+      'https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/163100/circuit-circuit-board-resistor-computer-163100.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 무역/수출 ===
+  {
+    keywords: ['무역', 'trade', '수출', 'export', '수입', 'import', '관세', 'tariff', '공급망', 'supply chain', '물류', 'logistics'],
+    images: [
+      'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
+      'https://images.unsplash.com/photo-1494412574643-ff11b0a5eb19?w=1200&q=80',
+      'https://images.pexels.com/photos/1427107/pexels-photo-1427107.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/2226458/pexels-photo-2226458.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 창업/스타트업 ===
+  {
+    keywords: ['창업', 'startup', '스타트업', 'venture', '벤처', '쿠팡', 'coupang', '유니콘'],
+    images: [
+      'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
+      'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1200&q=80',
+      'https://images.pexels.com/photos/7413915/pexels-photo-7413915.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === AI/인공지능 ===
+  {
+    keywords: ['AI', '인공지능', 'artificial intelligence', 'machine learning', '머신러닝', 'deep learning', 'GPT', 'chatbot', '챗봇', 'LLM'],
+    images: [
+      'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
+      'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
+      'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/6153354/pexels-photo-6153354.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 스마트폰/모바일 ===
+  {
+    keywords: ['스마트폰', 'smartphone', 'iPhone', '아이폰', '애플', 'apple', '갤럭시', 'galaxy', 'mobile'],
+    images: [
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+      'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=1200&q=80',
+      'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 배터리/에너지 ===
+  {
+    keywords: ['배터리', 'battery', '에너지', 'energy', '태양광', 'solar', '에코프로', '2차전지', '리튬'],
+    images: [
+      'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=1200&q=80',
+      'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1200&q=80',
+      'https://images.pexels.com/photos/9875441/pexels-photo-9875441.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/433308/pexels-photo-433308.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 쇼핑/소비/유통 ===
+  {
+    keywords: ['쇼핑', 'shopping', '소비', 'consumer', '홈쇼핑', '편의점', '유통', 'retail', 'e-commerce', '이커머스'],
+    images: [
+      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
+      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
+      'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/5632399/pexels-photo-5632399.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 패션/뷰티 ===
+  {
+    keywords: ['패션', 'fashion', '뷰티', 'beauty', '향수', 'perfume', '유니클로', 'uniqlo', '스트리트', 'streetwear', '럭셔리', 'luxury fashion', '오프화이트', '디자이너', 'designer'],
+    images: [
+      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+      'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1200&q=80',
+      'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/291762/pexels-photo-291762.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 음식/식품/요리 ===
+  {
+    keywords: ['음식', 'food', '식품', '요리', 'cooking', '디저트', 'dessert', '쿠키', '맛집', 'restaurant', '컬리', '식재료', 'grocery'],
+    images: [
+      'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80',
+      'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 운동/피트니스 ===
+  {
+    keywords: ['운동', 'fitness', 'exercise', '헬스', 'gym', 'workout', '요가', 'yoga', '웨어러블', 'wearable', 'NEAT'],
+    images: [
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
+      'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
+      'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/2294361/pexels-photo-2294361.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 웰니스/명상/디톡스 ===
+  {
+    keywords: ['웰빙', 'wellness', '명상', 'meditation', '디톡스', 'detox', '마음챙김', 'mindfulness', '수면', 'sleep', '얼음목욕', 'ice bath'],
+    images: [
+      'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80',
+      'https://images.pexels.com/photos/3822622/pexels-photo-3822622.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3560044/pexels-photo-3560044.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 건강/의료 ===
+  {
+    keywords: ['의료', 'medical', 'health', '건강', '병원', 'hospital', '의사', 'doctor', '정신건강', 'mental health'],
+    images: [
+      'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80',
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80',
+      'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 교육/학습 ===
+  {
+    keywords: ['교육', 'education', '학습', 'learning', '인강', '학자금', 'student loan', '대학'],
+    images: [
+      'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
+      'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&q=80',
+      'https://images.pexels.com/photos/5905709/pexels-photo-5905709.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/256395/pexels-photo-256395.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 스포츠 ===
+  {
+    keywords: ['스포츠', 'sports', '축구', 'football', 'soccer', '골프', 'golf', '야구', 'baseball', '농구', 'basketball', '올림픽', 'olympics', '챔피언스리그', 'champions league', '분데스리가', 'bundesliga', '슈퍼볼', 'super bowl', '스노보드', 'snowboard', '프로암'],
+    images: [
+      'https://images.unsplash.com/photo-1461896836934-bd45ba21e0c7?w=1200&q=80',
+      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80',
+      'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/2570139/pexels-photo-2570139.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === K-팝/음악/엔터 ===
+  {
+    keywords: ['K-팝', 'kpop', 'k-pop', '아이돌', 'idol', '뉴진스', 'newjeans', '음악', 'music', '그래미', 'grammy', '콘서트', 'concert', '스트리밍', 'streaming', '현역가왕'],
+    images: [
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80',
+      'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=1200&q=80',
+      'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 우주/항공 ===
+  {
+    keywords: ['우주', 'space', '항공', 'aerospace', '로켓', 'rocket', '블루오리진', 'blue origin', 'SpaceX', '스페이스X', 'NASA'],
+    images: [
+      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80',
+      'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=1200&q=80',
+      'https://images.pexels.com/photos/586063/pexels-photo-586063.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/73910/mars-mars-rover-space-travel-robot-73910.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 사랑/관계/기념일 ===
+  {
+    keywords: ['발렌타인', 'valentine', '사랑', 'love', 'romance', '커플', 'couple', '결혼', 'wedding', '데이트', 'dating'],
+    images: [
+      'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=1200&q=80',
+      'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=1200&q=80',
+      'https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/842876/pexels-photo-842876.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 날씨/자연재해 ===
+  {
+    keywords: ['폭풍', 'storm', '날씨', 'weather', '태풍', 'typhoon', '겨울', 'winter', '기후', 'climate', '홍수', 'flood'],
+    images: [
+      'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=1200&q=80',
+      'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1200&q=80',
+      'https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 로봇/휴머노이드 ===
+  {
+    keywords: ['로봇', 'robot', '휴머노이드', 'humanoid', '자동화', 'automation'],
+    images: [
+      'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
+      'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=1200&q=80',
+      'https://images.pexels.com/photos/2599244/pexels-photo-2599244.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/8566473/pexels-photo-8566473.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 여행/관광 ===
+  {
+    keywords: ['여행', 'travel', '관광', 'tourism', '비자', 'visa', '벚꽃', 'cherry blossom', '항공', 'flight', '호텔', 'hotel'],
+    images: [
+      'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+      'https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3278215/pexels-photo-3278215.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 1인가구/라이프스타일 ===
+  {
+    keywords: ['1인가구', 'solo', '솔로', 'single', '라이프스타일', 'lifestyle', '자기계발', 'self-improvement'],
+    images: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
+      'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=1200&q=80',
+      'https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/3771069/pexels-photo-3771069.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 리콜/소비자보호 ===
+  {
+    keywords: ['리콜', 'recall', '소비자보호', 'consumer protection', '제품안전', 'product safety', '결함'],
+    images: [
+      'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80',
+      'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1200&q=80',
+      'https://images.pexels.com/photos/5668882/pexels-photo-5668882.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/4386373/pexels-photo-4386373.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 스포츠베팅/게임 ===
+  {
+    keywords: ['베팅', 'betting', '스포츠베팅', 'sports betting', '카지노', 'casino', '게임', 'gaming'],
+    images: [
+      'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=1200&q=80',
+      'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1200&q=80',
+      'https://images.pexels.com/photos/6664248/pexels-photo-6664248.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+  // === 미국/정치/대통령 ===
+  {
+    keywords: ['대통령', 'president', '정치', 'politics', '백악관', 'white house', '프레지던트', 'election', '선거'],
+    images: [
+      'https://images.unsplash.com/photo-1501466044931-62695aada8e9?w=1200&q=80',
+      'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1200&q=80',
+      'https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      'https://images.pexels.com/photos/129112/pexels-photo-129112.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    ]
+  },
+];
 
-  // 쇼핑/소비
-  '홈쇼핑': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
-  '쇼핑': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
-  '소비': 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
-  '편의점': 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&q=80',
-
-  // 금융/투자/경제
-  '연말정산': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
-  '세금': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
-  '투자': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-  '엔화': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-  '금융': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-  '경제': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
-  '주식': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-  'stock': 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-  '부동산': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
-  'real estate': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80',
-  '환율': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
-  '금리': 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80',
-  '물가': 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
-  '인플레이션': 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
-  '고용': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
-  '취업': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
-  '창업': 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
-  '스타트업': 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
-  '무역': 'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
-  '수출': 'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
-  '반도체': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
-  '삼성': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
-
-  // IT/기술
-  'AI': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
-  '인공지능': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
-  '스마트폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
-  'iPhone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
-  '아이폰': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
-  '애플': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
-  'Apple': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
-  '로봇': 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80',
-
-  // 자동차
-  '기아': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  '현대': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  'EV5': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  'EV6': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  'EV9': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-  '자동차': 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80',
-
-  // 셀러브리티/패션 인물
-  '칸예': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-  '웨스트': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-  '이지': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-  'Yeezy': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-  '노스': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
-  '카다시안': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
-
-  // 음식/식품
-  '음식': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
-  '식품': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
-  '쿠키': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&q=80',
-  '디저트': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&q=80',
-  '컬리': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
-
-  // 패션/뷰티
-  '패션': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
-  '향수': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=1200&q=80',
-  '뷰티': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&q=80',
-  '유니클로': 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1200&q=80',
-
-  // 교육
-  '교육': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
-  '인강': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
-  '학습': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
-
-  // 라이프스타일
-  '운동': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
-  '헬스': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
-  '수면': 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=1200&q=80',
-  '1인가구': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
-  '디톡스': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80'
-};
-
-// 카테고리별 기본 이미지 (Unsplash - 저작권 무료)
-// 이미지 풀 확장 + 기존 게시글과 중복 방지 로직 포함
-const IMAGE_POOL = {
+// 카테고리별 폴백 이미지 (토픽 매칭 실패시 사용, Unsplash + Pexels 혼합)
+const CATEGORY_FALLBACK = {
   '인사이트': [
     'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80',
     'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80',
-    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
-    'https://images.unsplash.com/photo-1553484771-371a605b060b?w=1200&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80',
-    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=1200&q=80',
     'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
     'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80',
-    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80'
+    'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=1200',
   ],
   '경제': [
-    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80',
-    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=1200&q=80',
-    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80',
-    'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200&q=80',
     'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
-    'https://images.unsplash.com/photo-1553729459-uj8852516f06?w=1200&q=80',
-    'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=1200&q=80',
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=80',
-    'https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&q=80',
-    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80'
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80',
+    'https://images.pexels.com/photos/6801648/pexels-photo-6801648.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/7567443/pexels-photo-7567443.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/5926382/pexels-photo-5926382.jpeg?auto=compress&cs=tinysrgb&w=1200',
   ],
   '라이프': [
-    'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=80',
     'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200&q=80',
-    'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80',
-    'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
-    'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=1200&q=80',
-    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80',
-    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200&q=80',
     'https://images.unsplash.com/photo-1507120410856-1f35574c3b45?w=1200&q=80',
     'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200&q=80',
-    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=80'
+    'https://images.pexels.com/photos/3822622/pexels-photo-3822622.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/3560044/pexels-photo-3560044.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&w=1200',
   ],
   '브랜드': [
     'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80',
-    'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&q=80',
-    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
     'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1200&q=80',
-    'https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=1200&q=80',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
     'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&q=80',
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
     'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1200&q=80',
-    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80'
+    'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/5632399/pexels-photo-5632399.jpeg?auto=compress&cs=tinysrgb&w=1200',
   ]
 };
 
@@ -700,95 +950,56 @@ function getUsedImages(posts) {
   return posts.map(p => p.image).filter(Boolean);
 }
 
-// 키워드 기반 이미지 매칭 (콘텐츠-이미지 주제 일치 검증)
-function getKeywordMatchedImage(title, keyword, existingPosts = []) {
-  const usedImages = [...getUsedImages(existingPosts), ...usedImagesInSession];
-  const searchText = `${title} ${keyword}`.toLowerCase();
+// 토픽 매칭: 검색 텍스트에서 가장 많은 키워드가 일치하는 토픽 찾기
+function findMatchingTopic(searchTexts) {
+  let bestTopic = null;
+  let bestScore = 0;
 
-  // 키워드 매칭 우선순위로 이미지 선택
-  for (const [key, imageUrl] of Object.entries(KEYWORD_IMAGE_MAP)) {
-    if (searchText.includes(key.toLowerCase())) {
-      // 중복 체크
-      if (!usedImages.includes(imageUrl)) {
-        console.log(`Keyword matched image for "${key}": ${imageUrl.split('/').pop().split('?')[0]}`);
-        usedImagesInSession.push(imageUrl);
-        return imageUrl;
+  const combined = searchTexts.join(' ').toLowerCase();
+
+  for (const topic of TOPIC_IMAGES) {
+    let score = 0;
+    for (const kw of topic.keywords) {
+      if (combined.includes(kw.toLowerCase())) {
+        // 긴 키워드일수록 높은 점수 (더 정확한 매칭)
+        score += kw.length;
       }
     }
+    if (score > bestScore) {
+      bestScore = score;
+      bestTopic = topic;
+    }
   }
 
-  return null; // 매칭 실패시 null 반환
+  return bestTopic;
 }
 
-// 중복 방지 이미지 선택 (키워드 매칭 우선)
+// 중복 방지 이미지 선택 (토픽 기반)
 function getDefaultImage(category, existingPosts = [], title = '', keyword = '', imageKeyword = '') {
-  // 0. AI가 제안한 image_keyword로 Unsplash 직접 URL 생성 (최우선)
-  if (imageKeyword) {
-    const unsplashSearchUrl = `https://images.unsplash.com/photo-${imageKeyword}?w=1200&q=80`;
-    // image_keyword는 Unsplash 검색용이므로 KEYWORD_IMAGE_MAP에서 먼저 매칭 시도
-    const matchedByAI = getKeywordMatchedImage(title, imageKeyword, existingPosts);
-    if (matchedByAI) {
-      console.log(`AI image_keyword matched: "${imageKeyword}"`);
-      return matchedByAI;
-    }
-  }
-
-  // 1. 트렌드 키워드 기반 매칭 시도
-  if (title || keyword) {
-    const matchedImage = getKeywordMatchedImage(title, keyword, existingPosts);
-    if (matchedImage) {
-      return matchedImage;
-    }
-  }
-
-  // 2. 키워드 매칭 실패시 카테고리 기반 선택
-  const pool = IMAGE_POOL[category] || IMAGE_POOL['인사이트'];
   const usedImages = [...getUsedImages(existingPosts), ...usedImagesInSession];
 
-  // 사용되지 않은 이미지 필터링
-  const availableImages = pool.filter(img => !usedImages.includes(img));
+  // 1. 토픽 매칭 시도: image_keyword(영어) + 제목(한국어) + 원본 키워드 모두 사용
+  const searchTexts = [imageKeyword, title, keyword].filter(Boolean);
+  const topic = findMatchingTopic(searchTexts);
 
-  // 모든 이미지가 사용된 경우 전체 풀에서 랜덤 선택 (순환)
-  const selectedPool = availableImages.length > 0 ? availableImages : pool;
-
-  const randomIdx = Math.floor(Math.random() * selectedPool.length);
-  const selectedImage = selectedPool[randomIdx];
-
-  // 세션 내 사용 기록
-  usedImagesInSession.push(selectedImage);
-
-  console.log(`Category fallback image for ${category}: ${selectedImage.split('/').pop().split('?')[0]}`);
-  return selectedImage;
-}
-
-// 콘텐츠-이미지 주제 일치 검증 함수
-function validateImageContentMatch(post) {
-  const { title, content, image } = post;
-  const textToCheck = `${title} ${content}`.toLowerCase();
-
-  // 이미지 URL에서 ID 추출
-  const imageId = image.split('/').pop().split('?')[0];
-
-  // 키워드 매핑에서 해당 이미지가 어떤 키워드에 매칭되는지 확인
-  let expectedKeywords = [];
-  for (const [key, url] of Object.entries(KEYWORD_IMAGE_MAP)) {
-    if (url.includes(imageId)) {
-      expectedKeywords.push(key.toLowerCase());
-    }
+  if (topic) {
+    // 토픽 내 미사용 이미지 찾기
+    const available = topic.images.filter(img => !usedImages.includes(img));
+    const pool = available.length > 0 ? available : topic.images;
+    const selected = pool[Math.floor(Math.random() * pool.length)];
+    usedImagesInSession.push(selected);
+    console.log(`✓ Topic matched image for [${searchTexts.join(', ')}]`);
+    return selected;
   }
 
-  // 매핑된 키워드가 콘텐츠에 포함되어 있는지 검증
-  if (expectedKeywords.length > 0) {
-    const hasMatch = expectedKeywords.some(keyword => textToCheck.includes(keyword));
-    if (!hasMatch) {
-      console.warn(`⚠️ Image-content mismatch detected for post: ${title}`);
-      console.warn(`   Expected keywords: ${expectedKeywords.join(', ')}`);
-      return false;
-    }
-  }
-
-  console.log(`✓ Image-content validation passed for: ${title}`);
-  return true;
+  // 2. 토픽 매칭 실패 → 카테고리 폴백
+  const fallback = CATEGORY_FALLBACK[category] || CATEGORY_FALLBACK['인사이트'];
+  const available = fallback.filter(img => !usedImages.includes(img));
+  const pool = available.length > 0 ? available : fallback;
+  const selected = pool[Math.floor(Math.random() * pool.length)];
+  usedImagesInSession.push(selected);
+  console.log(`⚠️ No topic match, category fallback for: ${category}`);
+  return selected;
 }
 
 // sitemap.xml 자동 생성 함수
