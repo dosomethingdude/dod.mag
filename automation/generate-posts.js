@@ -1,6 +1,6 @@
 /**
  * dod.mag 자동 글 생성 스크립트
- * GitHub Actions에서 실행되어 Claude API로 글을 생성합니다.
+ * GitHub Actions에서 실행되어 Google Gemini API로 글을 생성합니다.
  */
 
 const fs = require('fs');
@@ -10,7 +10,7 @@ const { parseString } = require('xml2js');
 
 // 설정
 const CONFIG = {
-  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   // 글로벌 트렌드 RSS (한국 + 미국)
   TRENDS_RSS_URLS: [
     'https://trends.google.co.kr/trending/rss?geo=KR',
@@ -312,34 +312,33 @@ function cleanBrokenCharacters(text) {
   return cleaned.trim();
 }
 
-// Claude API 호출
+// Gemini API 호출
 async function callClaudeAPI(prompt) {
-  const url = 'https://api.anthropic.com/v1/messages';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
   const headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': CONFIG.ANTHROPIC_API_KEY,
-    'anthropic-version': '2023-06-01'
+    'Content-Type': 'application/json'
   };
 
   const body = {
-    model: 'claude-sonnet-4-5-20250929',
-    max_tokens: 16384,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }]
+    contents: [{
+      parts: [{ text: prompt }]
+    }],
+    generationConfig: {
+      maxOutputTokens: 16384,
+      temperature: 0.7
+    }
   };
 
   const response = await httpPost(url, body, headers);
 
   if (response.error) {
-    throw new Error(`Claude API error: ${response.error.message}`);
+    throw new Error(`Gemini API error: ${response.error.message}`);
   }
 
-  const text = response.content?.[0]?.text;
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) {
-    throw new Error('Empty response from Claude API');
+    throw new Error('Empty response from Gemini API');
   }
 
   return text;
@@ -427,8 +426,8 @@ async function main() {
   console.log(`Date: ${getTodayDate()}`);
   console.log(`Posts per day: ${CONFIG.POSTS_PER_DAY}`);
 
-  if (!CONFIG.ANTHROPIC_API_KEY) {
-    console.error('ERROR: ANTHROPIC_API_KEY is not set');
+  if (!CONFIG.GEMINI_API_KEY) {
+    console.error('ERROR: GEMINI_API_KEY is not set');
     process.exit(1);
   }
 
