@@ -312,65 +312,115 @@ function cleanBrokenCharacters(text) {
   return cleaned.trim();
 }
 
-// Gemini API 호출 (rate limit 재시도 포함)
+// 사용 가능한 Gemini 모델 목록 조회
+async function listAvailableModels() {
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${CONFIG.GEMINI_API_KEY}`;
+    const response = await new Promise((resolve, reject) => {
+      const https = require('https');
+      https.get(url, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+        });
+      }).on('error', reject);
+    });
+
+    if (response.error) {
+      console.log(`모델 목록 조회 실패: ${response.error.message}`);
+      return [];
+    }
+
+    const generativeModels = (response.models || [])
+      .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+      .map(m => m.name.replace('models/', ''));
+    console.log(`사용 가능한 모델 ${generativeModels.length}개: ${generativeModels.join(', ')}`);
+    return generativeModels;
+  } catch (e) {
+    console.log(`모델 목록 조회 예외: ${e.message}`);
+    return [];
+  }
+}
+
+// Gemini API 호출 (rate limit 재시도 + 모델 자동 탐색)
 async function callClaudeAPI(prompt) {
-  const models = ['gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-pro'];
+  // 우선 시도할 모델 목록 (최신순)
+  const preferredModels = [
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-pro',
+    'gemini-1.5-pro-latest'
+  ];
+
+  // 사용 가능한 모델 조회하여 우선순위 정렬
+  const available = await listAvailableModels();
+  let models;
+  if (available.length > 0) {
+    // 선호 모델 중 사용 가능한 것만 + 나머지 사용 가능 모델
+    models = preferredModels.filter(m => available.includes(m));
+    const extras = available.filter(m => !models.includes(m) && m.includes('gemini'));
+    models = [...models, ...extras];
+    console.log(`시도할 모델 순서: ${models.join(', ')}`);
+  } else {
+    models = preferredModels;
+    console.log(`모델 목록 조회 실패, 기본 목록 사용: ${models.join(', ')}`);
+  }
+
+  // v1beta와 v1 두 API 버전 모두 시도
+  const apiVersions = ['v1beta', 'v1'];
 
   for (const model of models) {
-    try {
-      console.log(`Trying Gemini model: ${model}`);
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+    for (const apiVersion of apiVersions) {
+      try {
+        console.log(`Trying: ${model} (${apiVersion})`);
+        const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
-      const headers = {
-        'Content-Type': 'application/json'
-      };
+        const headers = { 'Content-Type': 'application/json' };
+        const body = {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 16384, temperature: 0.7 }
+        };
 
-      const body = {
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 16384,
-          temperature: 0.7
-        }
-      };
+        const response = await httpPost(url, body, headers);
 
-      const response = await httpPost(url, body, headers);
-
-      // rate limit → 30초 대기 후 재시도
-      if (response.error && response.error.code === 429) {
-        console.log(`Rate limited on ${model}, waiting 30s...`);
-        await new Promise(r => setTimeout(r, 30000));
-        const retry = await httpPost(url, body, headers);
-        if (retry.error) {
-          console.log(`${model} retry failed: ${retry.error.message}`);
+        // rate limit → 30초 대기 후 재시도
+        if (response.error && response.error.code === 429) {
+          console.log(`Rate limited on ${model} (${apiVersion}), waiting 30s...`);
+          await new Promise(r => setTimeout(r, 30000));
+          const retry = await httpPost(url, body, headers);
+          if (retry.error) {
+            console.log(`${model} (${apiVersion}) retry failed: ${retry.error.message}`);
+            continue;
+          }
+          const retryText = retry.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (retryText) return retryText;
           continue;
         }
-        const retryText = retry.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (retryText) return retryText;
+
+        if (response.error) {
+          console.log(`${model} (${apiVersion}) error: ${response.error.message}`);
+          continue;
+        }
+
+        const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+          console.log(`${model} (${apiVersion}): empty response`);
+          continue;
+        }
+
+        console.log(`✓ Success with ${model} (${apiVersion})`);
+        return text;
+      } catch (e) {
+        console.log(`${model} (${apiVersion}) exception: ${e.message}`);
         continue;
       }
-
-      if (response.error) {
-        console.log(`${model} error: ${response.error.message}`);
-        continue;  // 다음 모델 시도
-      }
-
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) {
-        console.log(`${model}: empty response`);
-        continue;
-      }
-
-      console.log(`✓ Success with ${model}`);
-      return text;
-    } catch (e) {
-      console.log(`${model} exception: ${e.message}`);
-      continue;
     }
   }
 
-  throw new Error('All Gemini models failed');
+  throw new Error('All Gemini models failed. API 키를 확인하세요: https://aistudio.google.com/apikey');
 }
 
 // 오늘 날짜 포맷
