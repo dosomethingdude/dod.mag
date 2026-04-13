@@ -1,10 +1,7 @@
 name: Auto Generate Post
 
 on:
-  # 매일 한국 시간 오전 6시 실행 (UTC 21시)
-  schedule:
-    - cron: '0 21 * * *'
-  # 수동 실행 가능
+  # 자동 글 생성 중단 (2026-04-13)
   workflow_dispatch:
 
 permissions:
